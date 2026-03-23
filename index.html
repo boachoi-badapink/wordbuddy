@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌟 단어 친구 - 영어 단어장</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #6DD5FA;
+    --sun: #FFD93D;
+    --grass: #6BCB77;
+    --coral: #FF6B6B;
+    --lavender: #C77DFF;
+    --peach: #FFB347;
+    --mint: #00D2A0;
+    --white: #FFFEF7;
+    --ink: #2D2D2D;
+    --card-bg: #FFFFFF;
+    --shadow: 0 8px 32px rgba(0,0,0,0.12);
+    --radius: 24px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Floating bubbles background */
+  .bg-bubbles {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 0.15; }
+    90% { opacity: 0.15; }
+    100% { transform: translateY(-200px) scale(1.2); opacity: 0; }
+  }
+
+  /* App Shell */
+  .app {
+    position: relative; z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 80px;
+  }
+
+  /* Header */
+  .header {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    padding: 20px 24px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .header-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 26px;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .word-count-badge {
+    background: var(--sun);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 2px solid rgba(255,255,255,0.5);
+  }
+
+  /* Nav Tabs */
+  .nav-tabs {
+    display: flex;
+    background: rgba(255,255,255,0.1);
+    margin: 16px 16px 0;
+    border-radius: 20px;
+    padding: 4px;
+    gap: 4px;
+  }
+  .nav-tab {
+    flex: 1;
+    padding: 10px 4px;
+    background: transparent;
+    border: none;
+    border-radius: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .nav-tab.active {
+    background: white;
+    color: #764ba2;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .nav-tab .tab-icon { font-size: 20px; }
+
+  /* Pages */
+  .page { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Cards */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+
+  /* Word List */
+  .word-item {
+    background: white;
+    border-radius: 20px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 5px solid transparent;
+  }
+  .word-item:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .word-emoji-box {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+  .word-info { flex: 1; min-width: 0; }
+  .word-english {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .word-pronunciation {
+    font-size: 12px;
+    color: #9B9B9B;
+    font-style: italic;
+    margin-top: 1px;
+  }
+  .word-korean {
+    font-size: 15px;
+    color: #555;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .word-actions { display: flex; gap: 6px; }
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .icon-btn:hover { transform: scale(1.15); }
+  .btn-speak { background: #EEF6FF; color: #3B82F6; }
+  .btn-delete { background: #FFF0F0; color: var(--coral); }
+
+  /* Add Word Form */
+  .section-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .input-group { margin-bottom: 16px; }
+  .input-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #666;
+    margin-bottom: 6px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .input-field {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2.5px solid #E8E8E8;
+    border-radius: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    background: #FAFAFA;
+  }
+  .input-field:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 0 4px rgba(118,75,162,0.1);
+    background: white;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 18px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 20px rgba(118,75,162,0.4);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(118,75,162,0.5); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* Auto-fill preview */
+  .auto-fill-preview {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border: 2px solid #BAE6FD;
+    border-radius: 18px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    display: none;
+    animation: slideDown 0.3s ease;
+  }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  .auto-fill-preview.show { display: block; }
+  .preview-emoji { font-size: 48px; text-align: center; margin-bottom: 8px; }
+  .preview-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .preview-label { font-size: 12px; color: #666; font-weight: 600; }
+  .preview-value { font-size: 15px; color: var(--ink); font-weight: 700; }
+  .loading-dots::after {
+    content: '...';
+    animation: dots 1s steps(3, end) infinite;
+  }
+  @keyframes dots { 0%,20% {content:'.'} 40%,60% {content:'..'} 80%,100% {content:'...'} }
+
+  /* Camera capture area */
+  .capture-zone {
+    background: linear-gradient(135deg, #FFF8E7, #FFFDE7);
+    border: 3px dashed var(--sun);
+    border-radius: 20px;
+    padding: 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .capture-zone:hover { background: linear-gradient(135deg, #FFF3CD, #FFF8DC); transform: scale(1.01); }
+  .capture-zone .icon { font-size: 48px; margin-bottom: 8px; }
+  .capture-zone .label { font-family: 'Fredoka One', cursive; font-size: 18px; color: #B8860B; }
+  .capture-zone .sub { font-size: 13px; color: #999; margin-top: 4px; }
+  #fileInput { display: none; }
+
+  /* Captured image preview */
+  #capturedPreview {
+    display: none;
+    margin-top: 12px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+  }
+  #capturedPreview img {
+    width: 100%; border-radius: 16px;
+    max-height: 200px; object-fit: cover;
+  }
+  .extract-btn {
+    margin-top: 12px;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--sun), var(--peach));
+    color: white;
+    border: none; border-radius: 16px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    cursor: pointer;
+    display: none;
+    box-shadow: 0 4px 14px rgba(255,180,70,0.5);
+    transition: transform 0.2s;
+  }
+  .extract-btn:hover { transform: translateY(-2px); }
+
+  /* Study Mode */
+  .study-card-container {
+    perspective: 1000px;
+    height: 320px;
+    margin-bottom: 20px;
+  }
+  .study-card {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+  .study-card.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    border-radius: 28px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 28px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+  }
+  .card-front {
+    background: linear-gradient(145deg, #667eea, #764ba2);
+    color: white;
+  }
+  .card-back {
+    background: linear-gradient(145deg, #FFD93D, #FF6B6B);
+    transform: rotateY(180deg);
+    color: white;
+  }
+  .study-emoji { font-size: 80px; margin-bottom: 16px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+  .study-word {
+    font-family: 'Fredoka One', cursive;
+    font-size: 48px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  .study-pronunciation {
+    font-size: 18px;
+    opacity: 0.85;
+    margin-top: 6px;
+    font-style: italic;
+  }
+  .study-korean {
+    font-family: 'Fredoka One', cursive;
+    font-size: 52px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  .flip-hint {
+    font-size: 14px;
+    opacity: 0.75;
+    margin-top: 12px;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .study-controls {
+    display: flex; gap: 12px; margin-bottom: 16px;
+  }
+  .study-btn {
+    flex: 1; padding: 14px;
+    border: none; border-radius: 18px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .btn-prev { background: white; color: #666; }
+  .btn-speak-big { background: linear-gradient(135deg, var(--sky), #3B82F6); color: white; font-size: 24px; }
+  .btn-next { background: white; color: #666; }
+  .study-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
+  .study-progress {
+    background: rgba(255,255,255,0.2);
+    border-radius: 30px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: white;
+    border-radius: 30px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    text-align: center;
+    font-size: 14px;
+    color: white;
+    font-weight: 700;
+    margin-bottom: 16px;
+    opacity: 0.9;
+  }
+
+  /* Quiz Mode */
+  .quiz-question {
+    background: white;
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .quiz-emoji { font-size: 72px; margin-bottom: 12px; }
+  .quiz-prompt { font-size: 16px; color: #888; font-weight: 600; margin-bottom: 6px; }
+  .quiz-word {
+    font-family: 'Fredoka One', cursive;
+    font-size: 44px;
+    color: var(--ink);
+  }
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .quiz-option {
+    background: white;
+    border: 3px solid #E8E8E8;
+    border-radius: 18px;
+    padding: 18px 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+  .quiz-option:hover { border-color: #764ba2; transform: translateY(-2px); }
+  .quiz-option.correct { background: #DCFCE7; border-color: var(--grass); color: #166534; }
+  .quiz-option.wrong { background: #FFF0F0; border-color: var(--coral); color: #991B1B; }
+  .quiz-option:disabled { cursor: not-allowed; }
+
+  .quiz-score {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: flex; gap: 16px;
+    margin-bottom: 16px;
+  }
+  .score-item {
+    flex: 1; text-align: center;
+    background: #F8F9FA;
+    border-radius: 16px;
+    padding: 14px;
+  }
+  .score-num { font-family: 'Fredoka One', cursive; font-size: 36px; }
+  .score-label { font-size: 12px; color: #888; font-weight: 600; margin-top: 2px; }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(255,255,255,0.8);
+  }
+  .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+  .empty-state p { font-size: 18px; font-weight: 600; }
+  .empty-state small { font-size: 14px; opacity: 0.7; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 100px; left: 50%; transform: translateX(-50%);
+    background: rgba(30,30,30,0.9);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 700;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.3);
+    display: flex;
+    z-index: 50;
+    padding: 8px 0;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--coral);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: 4px;
+  }
+
+  /* Color accents per index */
+  .color-0 { background: #FFF0F8; border-left-color: #FF6B9D; }
+  .color-0 .word-emoji-box { background: #FFE4F0; }
+  .color-0 .word-english { color: #C0446A; }
+  .color-1 { background: #F0FFF4; border-left-color: #6BCB77; }
+  .color-1 .word-emoji-box { background: #DCFCE7; }
+  .color-1 .word-english { color: #276749; }
+  .color-2 { background: #FFF8E7; border-left-color: #FFD93D; }
+  .color-2 .word-emoji-box { background: #FEF3C7; }
+  .color-2 .word-english { color: #92400E; }
+  .color-3 { background: #F0F4FF; border-left-color: #667EEA; }
+  .color-3 .word-emoji-box { background: #E0E7FF; }
+  .color-3 .word-english { color: #3730A3; }
+  .color-4 { background: #FFF0FF; border-left-color: #C77DFF; }
+  .color-4 .word-emoji-box { background: #F3E8FF; }
+  .color-4 .word-english { color: #6B21A8; }
+
+  .thinking-spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(118,75,162,0.3);
+    border-top-color: #764ba2;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .no-words-study {
+    background: rgba(255,255,255,0.15);
+    border-radius: var(--radius);
+    padding: 40px 24px;
+    text-align: center;
+    color: white;
+  }
+  .no-words-study .big-icon { font-size: 64px; margin-bottom: 12px; }
+
+  /* Study toggles */
+  .study-toggles {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .toggle-pill {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 30px;
+    border: 2.5px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    user-select: none;
+  }
+  .toggle-pill.on {
+    background: white;
+    color: #764ba2;
+    border-color: white;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  }
+  .toggle-pill .toggle-icon { font-size: 18px; }
+  .toggle-switch {
+    width: 36px; height: 20px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+  .toggle-pill.on .toggle-switch { background: #6BCB77; }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 14px; height: 14px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.25s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .toggle-pill.on .toggle-switch::after { transform: translateX(16px); }
+
+  /* Quiz styles - picture version */
+  .quiz-picture-box {
+    width: 120px; height: 120px;
+    margin: 0 auto 16px;
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 80px;
+    background: linear-gradient(135deg, #f0f4ff, #e8f5e9);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  }
+  .quiz-options-english {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .quiz-option-english {
+    background: white;
+    border: 3px solid #E8E8E8;
+    border-radius: 18px;
+    padding: 18px 10px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    text-align: center;
+  }
+  .quiz-option-english:hover { border-color: #764ba2; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+  .quiz-option-english.correct { background: #DCFCE7; border-color: var(--grass); color: #166534; }
+  .quiz-option-english.wrong { background: #FFF0F0; border-color: var(--coral); color: #991B1B; }
+  .quiz-option-english:disabled { cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<div class="bg-bubbles" id="bgBubbles"></div>
+
+<div class="app">
+  <div class="header">
+    <div class="header-title">🌟 단어 친구</div>
+    <div class="word-count-badge" id="wordCountBadge">0개</div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('wordList')">
+      <span class="tab-icon">📚</span>단어장
+    </button>
+    <button class="nav-tab" onclick="showPage('addWord')">
+      <span class="tab-icon">➕</span>추가
+    </button>
+    <button class="nav-tab" onclick="showPage('study')">
+      <span class="tab-icon">🎴</span>공부
+    </button>
+    <button class="nav-tab" onclick="showPage('quiz')">
+      <span class="tab-icon">🏆</span>테스트
+    </button>
+  </div>
+
+  <!-- Word List Page -->
+  <div class="page active" id="page-wordList">
+    <div id="wordListContainer"></div>
+  </div>
+
+  <!-- Add Word Page -->
+  <div class="page" id="page-addWord">
+    <!-- Camera Capture -->
+    <div class="card">
+      <div class="section-title">📷 알림장 캡처</div>
+      <div class="capture-zone" onclick="document.getElementById('fileInput').click()">
+        <div class="icon">📸</div>
+        <div class="label">알림장 사진 불러오기</div>
+        <div class="sub">탭해서 사진 선택</div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" onchange="handleImageCapture(event)">
+      <div id="capturedPreview">
+        <img id="capturedImg" src="" alt="캡처된 알림장">
+      </div>
+      <button class="extract-btn" id="extractBtn" onclick="extractWordFromImage()">🔍 단어 찾기</button>
+    </div>
+
+    <!-- Manual Add -->
+    <div class="card">
+      <div class="section-title">✏️ 직접 입력</div>
+      <div class="input-group">
+        <label class="input-label">영어 단어</label>
+        <input type="text" class="input-field" id="wordInput" placeholder="예: apple, dog, happy..." 
+               oninput="onWordInput(this.value)">
+      </div>
+
+      <div class="auto-fill-preview" id="autoFillPreview">
+        <div class="preview-emoji" id="previewEmoji">🔄</div>
+        <div class="preview-row">
+          <span class="preview-label">발음</span>
+          <span class="preview-value" id="previewPronunciation"><span class="loading-dots"></span></span>
+        </div>
+        <div class="preview-row">
+          <span class="preview-label">뜻</span>
+          <span class="preview-value" id="previewKorean"><span class="loading-dots"></span></span>
+        </div>
+      </div>
+
+      <div style="height: 16px;"></div>
+      <button class="btn-primary" id="addBtn" onclick="addWordManually()" disabled>
+        ✨ 단어 추가하기
+      </button>
+    </div>
+  </div>
+
+  <!-- Study Page -->
+  <div class="page" id="page-study">
+    <div id="studyContent"></div>
+  </div>
+
+  <!-- Quiz Page -->
+  <div class="page" id="page-quiz">
+    <div id="quizContent"></div>
+  </div>
+</div>
+
+<div class="bottom-nav" id="bottomNav" style="display:none"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DATA ============
+let words = JSON.parse(localStorage.getItem('kidVocab_words') || '[]');
+let studyIndex = 0;
+let studyFlipped = false;
+let studyShowPicture = true;
+let studyPlaySound = true;
+let quizState = { current: 0, correct: 0, wrong: 0, questions: [] };
+let wordInputTimer = null;
+let pendingWord = null;
+let capturedImageBase64 = null;
+
+function saveWords() {
+  localStorage.setItem('kidVocab_words', JSON.stringify(words));
+  updateWordCount();
+}
+
+function updateWordCount() {
+  document.getElementById('wordCountBadge').textContent = words.length + '개';
+}
+
+// ============ BACKGROUND BUBBLES ============
+(function() {
+  const container = document.getElementById('bgBubbles');
+  const colors = ['#FFD93D','#FF6B6B','#6BCB77','#6DD5FA','#C77DFF','#FFB347'];
+  for (let i = 0; i < 15; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = 40 + Math.random() * 100;
+    b.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${8+Math.random()*12}s;
+      animation-delay:${-Math.random()*15}s;
+    `;
+    container.appendChild(b);
+  }
+})();
+
+// ============ NAVIGATION ============
+let currentPage = 'wordList';
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-tab')[['wordList','addWord','study','quiz'].indexOf(page)].classList.add('active');
+  currentPage = page;
+  if (page === 'wordList') renderWordList();
+  if (page === 'study') renderStudy();
+  if (page === 'quiz') initQuiz();
+}
+
+// ============ WORD LIST ============
+const colorClasses = ['color-0','color-1','color-2','color-3','color-4'];
+
+function renderWordList() {
+  const container = document.getElementById('wordListContainer');
+  if (words.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📖</div>
+        <p>아직 단어가 없어요!</p>
+        <small>+ 추가 탭에서 새 단어를 등록해보세요</small>
+      </div>`;
+    return;
+  }
+  container.innerHTML = words.map((w, i) => `
+    <div class="word-item ${colorClasses[i % 5]}" onclick="speakWord('${w.english}')">
+      <div class="word-emoji-box">${w.emoji || '📝'}</div>
+      <div class="word-info">
+        <div class="word-english">${w.english}</div>
+        <div class="word-pronunciation">${w.pronunciation || ''}</div>
+        <div class="word-korean">${w.korean || ''}</div>
+      </div>
+      <div class="word-actions">
+        <button class="icon-btn btn-speak" onclick="event.stopPropagation(); speakWord('${w.english}')">🔊</button>
+        <button class="icon-btn btn-delete" onclick="event.stopPropagation(); deleteWord(${i})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteWord(i) {
+  if (confirm(`"${words[i].english}" 단어를 삭제할까요?`)) {
+    words.splice(i, 1);
+    saveWords();
+    renderWordList();
+    showToast('단어를 삭제했어요 🗑️');
+  }
+}
+
+// ============ WORD AUTO-FILL (Claude API) ============
+async function fetchWordData(word) {
+  const res = await fetch('/api/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 300,
+      messages: [{
+        role: 'user',
+        content: `영어 단어 "${word}"에 대해 6세 아이를 위한 정보를 JSON으로 답해줘. 다음 형식으로 JSON만 출력해:
+{"pronunciation":"발음기호(예: /æp.əl/)","korean":"한글 뜻(1-2단어)","emoji":"관련 이모지 1개","example":"짧은 영어 예문"}
+추가 설명 없이 JSON만 출력.`
+      }]
+    })
+  });
+  const data = await res.json();
+  const text = data.content.map(c => c.text || '').join('');
+  const clean = text.replace(/```json|```/g, '').trim();
+  return JSON.parse(clean);
+}
+
+let inputDebounce = null;
+function onWordInput(value) {
+  clearTimeout(inputDebounce);
+  const preview = document.getElementById('autoFillPreview');
+  const addBtn = document.getElementById('addBtn');
+  pendingWord = null;
+  addBtn.disabled = true;
+
+  if (!value.trim() || value.trim().length < 2) {
+    preview.classList.remove('show');
+    return;
+  }
+
+  preview.classList.add('show');
+  document.getElementById('previewEmoji').textContent = '🔄';
+  document.getElementById('previewPronunciation').innerHTML = '<span class="loading-dots"></span>';
+  document.getElementById('previewKorean').innerHTML = '<span class="loading-dots"></span>';
+
+  inputDebounce = setTimeout(async () => {
+    try {
+      const data = await fetchWordData(value.trim());
+      pendingWord = { english: value.trim(), ...data };
+      document.getElementById('previewEmoji').textContent = data.emoji || '📝';
+      document.getElementById('previewPronunciation').textContent = data.pronunciation || '-';
+      document.getElementById('previewKorean').textContent = data.korean || '-';
+      addBtn.disabled = false;
+    } catch (e) {
+      document.getElementById('previewEmoji').textContent = '⚠️';
+      document.getElementById('previewPronunciation').textContent = '불러오기 실패';
+      document.getElementById('previewKorean').textContent = '다시 시도해주세요';
+    }
+  }, 800);
+}
+
+function addWordManually() {
+  if (!pendingWord) return;
+  const existing = words.find(w => w.english.toLowerCase() === pendingWord.english.toLowerCase());
+  if (existing) { showToast('이미 있는 단어예요! ✨'); return; }
+  words.unshift(pendingWord);
+  saveWords();
+  document.getElementById('wordInput').value = '';
+  document.getElementById('autoFillPreview').classList.remove('show');
+  document.getElementById('addBtn').disabled = true;
+  pendingWord = null;
+  showToast(`"${words[0].english}" 추가 완료! 🎉`);
+  speakWord(words[0].english);
+}
+
+// ============ IMAGE CAPTURE ============
+function handleImageCapture(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    capturedImageBase64 = e.target.result.split(',')[1];
+    document.getElementById('capturedImg').src = e.target.result;
+    document.getElementById('capturedPreview').style.display = 'block';
+    document.getElementById('extractBtn').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function extractWordFromImage() {
+  if (!capturedImageBase64) return;
+  const btn = document.getElementById('extractBtn');
+  btn.textContent = '🔍 단어 찾는 중...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: capturedImageBase64 } },
+            { type: 'text', text: '이 이미지에서 오늘의 영어 단어를 찾아줘. 유치원 알림장에서 영어 단어 한 개를 찾아서 다음 JSON 형식으로만 답해줘: {"word":"영어단어","pronunciation":"발음기호","korean":"한글뜻","emoji":"이모지"} 영어 단어가 없으면 {"error":"단어없음"} 으로 답해.' }
+          ]
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(c => c.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    if (parsed.error) {
+      showToast('이미지에서 단어를 찾지 못했어요 😢');
+    } else {
+      const newWord = { english: parsed.word, pronunciation: parsed.pronunciation, korean: parsed.korean, emoji: parsed.emoji || '📝' };
+      const existing = words.find(w => w.english.toLowerCase() === newWord.english.toLowerCase());
+      if (existing) {
+        showToast(`"${newWord.english}"은 이미 있는 단어예요!`);
+      } else {
+        words.unshift(newWord);
+        saveWords();
+        showToast(`"${newWord.english}" 추가됐어요! 🎉`);
+        speakWord(newWord.english);
+        // Show in input
+        document.getElementById('wordInput').value = newWord.english;
+        pendingWord = newWord;
+        document.getElementById('previewEmoji').textContent = newWord.emoji;
+        document.getElementById('previewPronunciation').textContent = newWord.pronunciation;
+        document.getElementById('previewKorean').textContent = newWord.korean;
+        document.getElementById('autoFillPreview').classList.add('show');
+        document.getElementById('addBtn').disabled = true;
+      }
+    }
+  } catch(e) {
+    showToast('오류가 발생했어요. 다시 시도해주세요 🔄');
+  }
+  btn.textContent = '🔍 단어 찾기';
+  btn.disabled = false;
+}
+
+// ============ STUDY MODE ============
+function toggleStudyPicture() {
+  studyShowPicture = !studyShowPicture;
+  renderStudy(true);
+}
+function toggleStudySound() {
+  studyPlaySound = !studyPlaySound;
+  renderStudy(true);
+}
+
+function renderStudy(keepFlip) {
+  const container = document.getElementById('studyContent');
+  if (words.length === 0) {
+    container.innerHTML = `<div class="no-words-study"><div class="big-icon">📚</div><p style="font-family:'Fredoka One',cursive;font-size:22px;">단어를 먼저 추가해요!</p></div>`;
+    return;
+  }
+  if (studyIndex >= words.length) studyIndex = 0;
+  if (!keepFlip) studyFlipped = false;
+  const w = words[studyIndex];
+  const pct = ((studyIndex+1)/words.length*100).toFixed(0);
+
+  const emojiFront = studyShowPicture ? `<div class="study-emoji">${w.emoji || '📝'}</div>` : '';
+  const emojiBack  = studyShowPicture ? `<div class="study-emoji">${w.emoji || '📝'}</div>` : '';
+  const speakerBtn = studyPlaySound
+    ? `<button class="study-btn btn-speak-big" onclick="speakWord('${w.english}')">🔊</button>`
+    : `<button class="study-btn btn-speak-big" style="opacity:0.35;cursor:not-allowed" disabled>🔇</button>`;
+
+  container.innerHTML = `
+    <div class="study-toggles">
+      <button class="toggle-pill ${studyShowPicture ? 'on' : ''}" onclick="toggleStudyPicture()">
+        <span class="toggle-icon">🖼️</span> 그림
+        <div class="toggle-switch"></div>
+      </button>
+      <button class="toggle-pill ${studyPlaySound ? 'on' : ''}" onclick="toggleStudySound()">
+        <span class="toggle-icon">🔊</span> 소리
+        <div class="toggle-switch"></div>
+      </button>
+    </div>
+
+    <div class="study-progress"><div class="progress-bar" style="width:${pct}%"></div></div>
+    <div class="progress-label">${studyIndex+1} / ${words.length}</div>
+
+    <div class="study-card-container">
+      <div class="study-card ${studyFlipped ? 'flipped' : ''}" id="studyCard" onclick="flipCard()">
+        <div class="card-face card-front">
+          ${emojiFront}
+          <div class="study-word">${w.english}</div>
+          <div class="study-pronunciation">${w.pronunciation || ''}</div>
+          <div class="flip-hint">👆 탭해서 뜻 보기</div>
+        </div>
+        <div class="card-face card-back">
+          ${emojiBack}
+          <div class="study-korean">${w.korean || '?'}</div>
+          <div class="study-pronunciation">${w.english}</div>
+          <div class="flip-hint">👆 탭해서 단어 보기</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="study-controls">
+      <button class="study-btn btn-prev" onclick="prevStudy()">◀ 이전</button>
+      ${speakerBtn}
+      <button class="study-btn btn-next" onclick="nextStudy()">다음 ▶</button>
+    </div>
+  `;
+  if (!keepFlip && studyPlaySound) setTimeout(() => speakWord(w.english), 300);
+}
+
+function flipCard() {
+  studyFlipped = !studyFlipped;
+  const card = document.getElementById('studyCard');
+  if (card) card.classList.toggle('flipped', studyFlipped);
+}
+
+function nextStudy() {
+  studyIndex = (studyIndex + 1) % words.length;
+  renderStudy(false);
+}
+function prevStudy() {
+  studyIndex = (studyIndex - 1 + words.length) % words.length;
+  renderStudy(false);
+}
+
+// ============ QUIZ MODE ============
+function initQuiz() {
+  if (words.length < 2) {
+    document.getElementById('quizContent').innerHTML = `
+      <div class="no-words-study"><div class="big-icon">🏆</div>
+      <p style="font-family:'Fredoka One',cursive;font-size:20px;">단어가 2개 이상 있어야<br>테스트를 할 수 있어요!</p></div>`;
+    return;
+  }
+  quizState = { current: 0, correct: 0, wrong: 0, questions: buildQuestions() };
+  renderQuiz();
+}
+
+function buildQuestions() {
+  const shuffled = [...words].sort(() => Math.random()-0.5);
+  const count = Math.min(shuffled.length, 10);
+  return shuffled.slice(0, count).map(w => {
+    const wrongs = words.filter(x => x.english !== w.english).sort(() => Math.random()-0.5).slice(0,3);
+    const options = [...wrongs.map(x => x.english), w.english].sort(() => Math.random()-0.5);
+    return { word: w, answer: w.english, options };
+  });
+}
+
+function renderQuiz() {
+  const container = document.getElementById('quizContent');
+  const q = quizState.questions;
+  const i = quizState.current;
+
+  if (i >= q.length) {
+    const total = q.length;
+    const pct = Math.round(quizState.correct / total * 100);
+    let medal = pct === 100 ? '🥇' : pct >= 70 ? '🥈' : '🥉';
+    let msg = pct === 100 ? '완벽해요! 천재!' : pct >= 70 ? '잘 했어요! 조금만 더!' : '열심히 해봐요!';
+    container.innerHTML = `
+      <div class="card" style="text-align:center; padding:40px 24px;">
+        <div style="font-size:80px; margin-bottom:12px;">${medal}</div>
+        <div style="font-family:'Fredoka One',cursive; font-size:36px; color:#764ba2; margin-bottom:6px;">${pct}점!</div>
+        <div style="font-size:18px; color:#888; margin-bottom:6px;">${msg}</div>
+        <div style="font-size:16px; color:#555; margin-bottom:28px;">
+          ${total}문제 중 <b style="color:var(--grass)">${quizState.correct}개</b> 맞혔어요 ⭐
+        </div>
+        <button class="btn-primary" onclick="initQuiz()">🔄 다시 테스트</button>
+      </div>`;
+    return;
+  }
+
+  const curr = q[i];
+  const pct = (i/q.length*100).toFixed(0);
+
+  // Escape for inline onclick
+  const escapedOpts = curr.options.map(o => o.replace(/'/g, "\\'"));
+  const escapedAnswer = curr.answer.replace(/'/g, "\\'");
+
+  container.innerHTML = `
+    <div class="quiz-score">
+      <div class="score-item">
+        <div class="score-num" style="color:var(--grass)">${quizState.correct}</div>
+        <div class="score-label">맞음 ✓</div>
+      </div>
+      <div class="score-item">
+        <div class="score-num" style="color:var(--coral)">${quizState.wrong}</div>
+        <div class="score-label">틀림 ✗</div>
+      </div>
+      <div class="score-item">
+        <div class="score-num" style="color:#888">${q.length - i}</div>
+        <div class="score-label">남은 문제</div>
+      </div>
+    </div>
+    <div class="quiz-question">
+      <div class="quiz-picture-box">${curr.word.emoji || '📝'}</div>
+      <div class="quiz-prompt" style="font-size:15px; color:#777; font-weight:700; margin-bottom:4px;">이 그림의 영어 단어는?</div>
+      <div style="font-size:15px; color:#aaa; font-style:italic;">${curr.word.korean}</div>
+    </div>
+    <div class="quiz-options-english" id="quizOptions">
+      ${curr.options.map((opt, idx) => `
+        <button class="quiz-option-english" id="qopt-${idx}"
+          onclick="answerQuiz(this, '${escapedOpts[idx]}', '${escapedAnswer}')">
+          ${opt}
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function answerQuiz(btn, chosen, answer) {
+  document.querySelectorAll('.quiz-option-english').forEach(b => b.disabled = true);
+  if (chosen === answer) {
+    btn.classList.add('correct');
+    quizState.correct++;
+    showToast('정답이에요! 🎉');
+  } else {
+    btn.classList.add('wrong');
+    quizState.wrong++;
+    document.querySelectorAll('.quiz-option-english').forEach(b => {
+      if (b.textContent.trim() === answer) b.classList.add('correct');
+    });
+    showToast('아쉬워요! 정답은 ' + answer + ' 이에요 💪');
+  }
+  setTimeout(() => {
+    quizState.current++;
+    renderQuiz();
+  }, 1600);
+}
+
+// ============ TTS ============
+let ttsUnlocked = false;
+
+function unlockTTS() {
+  if (ttsUnlocked) return;
+  const u = new SpeechSynthesisUtterance('');
+  speechSynthesis.speak(u);
+  ttsUnlocked = true;
+}
+
+// Unlock TTS on first user interaction
+document.addEventListener('click', unlockTTS, { once: true });
+document.addEventListener('touchstart', unlockTTS, { once: true });
+
+function speakWord(word) {
+  if (!word) return;
+  const doSpeak = () => {
+    const utter = new SpeechSynthesisUtterance(word);
+    utter.lang = 'en-US';
+    utter.rate = 0.8;
+    utter.pitch = 1.2;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+  };
+  // If not yet unlocked by gesture, just try anyway (manual button taps will work)
+  doSpeak();
+}
+
+// ============ TOAST ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============ INIT ============
+updateWordCount();
+renderWordList();
+
+// Add some sample words if empty
+if (words.length === 0) {
+  const samples = [
+    { english: 'apple', pronunciation: '/æp.əl/', korean: '사과', emoji: '🍎' },
+    { english: 'dog', pronunciation: '/dɒɡ/', korean: '강아지', emoji: '🐶' },
+    { english: 'happy', pronunciation: '/hæp.i/', korean: '행복한', emoji: '😊' },
+  ];
+  words = samples;
+  saveWords();
+  renderWordList();
+}
+</script>
+</body>
+</html>
