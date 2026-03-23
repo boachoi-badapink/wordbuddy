@@ -13,12 +13,26 @@ export default async function handler(req, res) {
     let body = req.body;
     if (typeof body === 'string') body = JSON.parse(body);
 
+    // Extract prompt from Anthropic-style request
     const userMessage = body.messages?.[0]?.content;
-    const prompt = typeof userMessage === 'string'
-      ? userMessage
-      : Array.isArray(userMessage)
-        ? userMessage.map(p => p.text || '').join('\n')
-        : '';
+    let parts = [];
+
+    if (typeof userMessage === 'string') {
+      parts = [{ text: userMessage }];
+    } else if (Array.isArray(userMessage)) {
+      for (const item of userMessage) {
+        if (item.type === 'text') {
+          parts.push({ text: item.text });
+        } else if (item.type === 'image' && item.source?.data) {
+          parts.push({
+            inlineData: {
+              mimeType: item.source.media_type || 'image/jpeg',
+              data: item.source.data
+            }
+          });
+        }
+      }
+    }
 
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
@@ -26,8 +40,8 @@ export default async function handler(req, res) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.3 }
+          contents: [{ parts }],
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1000 }
         }),
       }
     );
