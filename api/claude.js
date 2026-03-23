@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     let body = req.body;
     if (typeof body === 'string') body = JSON.parse(body);
 
-    // Extract prompt from Anthropic-style request
     const userMessage = body.messages?.[0]?.content;
     let parts = [];
 
@@ -35,7 +34,7 @@ export default async function handler(req, res) {
     }
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,6 +46,7 @@ export default async function handler(req, res) {
     );
 
     const geminiData = await geminiRes.json();
+    console.log('Gemini response:', JSON.stringify(geminiData));
     const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     return res.status(200).json({
