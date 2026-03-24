@@ -728,9 +728,19 @@
 <div class="bottom-nav" id="bottomNav" style="display:none"></div>
 <div class="toast" id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
+// ============ FIREBASE SETUP ============
+const firebaseConfig = {
+  databaseURL: 'https://wordbuddy-a7091-default-rtdb.firebaseio.com'
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const wordsRef = db.ref('words');
+
 // ============ DATA ============
-let words = JSON.parse(localStorage.getItem('kidVocab_words') || '[]');
+let words = [];
 let studyIndex = 0;
 let studyFlipped = false;
 let studyShowPicture = true;
@@ -740,9 +750,31 @@ let wordInputTimer = null;
 let pendingWord = null;
 let capturedImageBase64 = null;
 
-function saveWords() {
-  localStorage.setItem('kidVocab_words', JSON.stringify(words));
+// Listen for real-time updates from Firebase
+wordsRef.on('value', (snapshot) => {
+  const data = snapshot.val();
+  words = data ? Object.values(data).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)) : [];
   updateWordCount();
+  if (document.getElementById('page-wordList').classList.contains('active')) renderWordList();
+  if (document.getElementById('page-study').classList.contains('active')) renderStudy();
+});
+
+async function saveWords() {
+  // Save all words to Firebase (keyed by index)
+  const obj = {};
+  words.forEach((w, i) => { obj['word_' + (w.createdAt || i)] = w; });
+  await wordsRef.set(obj);
+  updateWordCount();
+}
+
+async function addWord(word) {
+  word.createdAt = Date.now();
+  await wordsRef.push(word);
+}
+
+async function removeWord(createdAt) {
+  const snapshot = await wordsRef.orderByChild('createdAt').equalTo(createdAt).once('value');
+  snapshot.forEach(child => child.ref.remove());
 }
 
 function updateWordCount() {
@@ -805,17 +837,16 @@ function renderWordList() {
       </div>
       <div class="word-actions">
         <button class="icon-btn btn-speak" onclick="event.stopPropagation(); speakWord('${w.english}')">🔊</button>
-        <button class="icon-btn btn-delete" onclick="event.stopPropagation(); deleteWord(${i})">🗑️</button>
+        <button class="icon-btn btn-delete" onclick="event.stopPropagation(); deleteWord(${w.createdAt})">🗑️</button>
       </div>
     </div>
   `).join('');
 }
 
-function deleteWord(i) {
-  if (confirm(`"${words[i].english}" 단어를 삭제할까요?`)) {
-    words.splice(i, 1);
-    saveWords();
-    renderWordList();
+function deleteWord(createdAt) {
+  const w = words.find(w => w.createdAt === createdAt);
+  if (w && confirm(`"${w.english}" 단어를 삭제할까요?`)) {
+    removeWord(createdAt);
     showToast('단어를 삭제했어요 🗑️');
   }
 }
@@ -876,18 +907,16 @@ function onWordInput(value) {
   }, 800);
 }
 
-function addWordManually() {
+async function addWordManually() {
   if (!pendingWord) return;
   const existing = words.find(w => w.english.toLowerCase() === pendingWord.english.toLowerCase());
   if (existing) { showToast('이미 있는 단어예요! ✨'); return; }
-  words.unshift(pendingWord);
-  saveWords();
+  await addWord({...pendingWord});
   document.getElementById('wordInput').value = '';
   document.getElementById('autoFillPreview').classList.remove('show');
   document.getElementById('addBtn').disabled = true;
   pendingWord = null;
-  showToast(`"${words[0].english}" 추가 완료! 🎉`);
-  speakWord(words[0].english);
+  showToast(`단어 추가 완료! 🎉`);
 }
 
 // ============ IMAGE CAPTURE ============
@@ -939,8 +968,7 @@ async function extractWordFromImage() {
       if (existing) {
         showToast(`"${newWord.english}"은 이미 있는 단어예요!`);
       } else {
-        words.unshift(newWord);
-        saveWords();
+        await addWord(newWord);
         showToast(`"${newWord.english}" 추가됐어요! 🎉`);
         speakWord(newWord.english);
         // Show in input
@@ -1185,18 +1213,6 @@ function showToast(msg) {
 // ============ INIT ============
 updateWordCount();
 renderWordList();
-
-// Add some sample words if empty
-if (words.length === 0) {
-  const samples = [
-    { english: 'apple', pronunciation: '/æp.əl/', korean: '사과', emoji: '🍎' },
-    { english: 'dog', pronunciation: '/dɒɡ/', korean: '강아지', emoji: '🐶' },
-    { english: 'happy', pronunciation: '/hæp.i/', korean: '행복한', emoji: '😊' },
-  ];
-  words = samples;
-  saveWords();
-  renderWordList();
-}
 </script>
 </body>
 </html>
