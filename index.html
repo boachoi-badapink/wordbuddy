@@ -670,23 +670,35 @@
     box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     text-align: center;
   }
+  .stroke-guide-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+  }
+  .case-toggle {
+    display: flex; background: #F3F4F6; border-radius: 12px; padding: 3px; gap: 3px;
+  }
+  .case-btn {
+    padding: 5px 12px; border-radius: 9px; border: none; cursor: pointer;
+    font-family: 'Fredoka One', cursive; font-size: 14px; color: #888;
+    background: transparent; transition: all 0.2s;
+  }
+  .case-btn.active { background: white; color: #764ba2; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
   .stroke-letters {
-    display: flex; gap: 8px; justify-content: center;
+    display: flex; gap: 12px; justify-content: center;
     flex-wrap: wrap; margin-top: 8px;
   }
   .stroke-letter {
-    width: 44px; height: 52px;
+    width: 56px; height: 68px;
     background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 12px; display: flex; align-items: center;
+    border-radius: 14px; display: flex; align-items: center;
     justify-content: center;
-    font-family: 'Fredoka One', cursive; font-size: 26px;
+    font-family: 'Fredoka One', cursive; font-size: 36px;
     color: white; box-shadow: 0 4px 12px rgba(118,75,162,0.3);
     position: relative;
   }
   .stroke-letter .order-badge {
     position: absolute; top: -6px; right: -6px;
-    width: 18px; height: 18px; background: var(--sun);
-    border-radius: 50%; font-size: 10px; font-weight: 800;
+    width: 20px; height: 20px; background: var(--sun);
+    border-radius: 50%; font-size: 11px; font-weight: 800;
     color: var(--ink); display: flex; align-items: center; justify-content: center;
     font-family: 'Nunito', sans-serif;
   }
@@ -702,7 +714,7 @@
     display: flex; justify-content: space-between; align-items: center;
   }
   #writingCanvas {
-    width: 100%; height: 180px;
+    width: 100%; height: 240px;
     border: 2.5px dashed #C4B5FD; border-radius: 14px;
     cursor: crosshair; display: block;
     background: #fafafa;
@@ -711,9 +723,9 @@
   .canvas-guide-text {
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    font-family: 'Fredoka One', cursive; font-size: 48px;
-    color: rgba(118,75,162,0.08); pointer-events: none;
-    white-space: nowrap;
+    font-family: 'Fredoka One', cursive; font-size: 72px;
+    color: rgba(118,75,162,0.07); pointer-events: none;
+    white-space: nowrap; letter-spacing: 12px;
   }
   .canvas-container { position: relative; }
 
@@ -790,11 +802,11 @@
   }
   .stats-date-nav button {
     background: white; border: none; border-radius: 12px;
-    width: 36px; height: 36px; font-size: 16px;
-    cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
+    padding: 8px 14px; font-size: 13px; font-weight: 700;
+    color: #764ba2; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s; font-family: 'Nunito', sans-serif;
   }
-  .stats-date-nav button:hover { transform: scale(1.1); }
+  .stats-date-nav button:hover { transform: scale(1.05); }
   .stats-date-label {
     font-family: 'Fredoka One', cursive; font-size: 20px; color: white;
   }
@@ -1034,20 +1046,23 @@ function renderWordList() {
       </div>`;
     return;
   }
-  container.innerHTML = words.map((w, i) => `
+  container.innerHTML = words.map((w, i) => {
+    const dateStr = w.createdAt ? new Date(w.createdAt).toLocaleDateString('ko-KR', {month:'numeric', day:'numeric'}) : '';
+    return `
     <div class="word-item ${colorClasses[i % 5]}" onclick="speakWord('${w.english}')">
       <div class="word-emoji-box">${w.emoji || '📝'}</div>
       <div class="word-info">
         <div class="word-english">${w.english}</div>
         <div class="word-pronunciation">${w.pronunciation || ''}</div>
         <div class="word-korean">${w.korean || ''}</div>
+        ${dateStr ? `<div style="font-size:10px; color:#bbb; margin-top:2px;">📅 ${dateStr} 등록</div>` : ''}
       </div>
       <div class="word-actions">
         <button class="icon-btn btn-speak" onclick="event.stopPropagation(); speakWord('${w.english}')">🔊</button>
         <button class="icon-btn btn-delete" onclick="event.stopPropagation(); deleteWord(${w.createdAt})">🗑️</button>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 function deleteWord(createdAt) {
@@ -1384,7 +1399,8 @@ function answerQuiz(btn, chosen, answer) {
 // ============ WRITING PRACTICE ============
 let writingState = {
   word: null, totalRounds: 3, currentRound: 0,
-  results: [], isDrawing: false, strokes: [], lastX: 0, lastY: 0
+  results: [], isDrawing: false, strokes: [], lastX: 0, lastY: 0,
+  isUpperCase: true
 };
 
 function renderWriting() {
@@ -1440,6 +1456,7 @@ function renderWritingRound() {
   const round = writingState.currentRound;
   const total = writingState.totalRounds;
   const container = document.getElementById('writingContent');
+  const displayWord = writingState.isUpperCase ? w.english.toUpperCase() : w.english.toLowerCase();
 
   const roundDots = Array.from({length: total}, (_, i) => {
     let cls = '';
@@ -1450,9 +1467,15 @@ function renderWritingRound() {
 
   container.innerHTML = `
     <div class="stroke-guide">
-      <div style="font-size:13px; color:#888; font-weight:600; margin-bottom:6px;">획순 가이드</div>
+      <div class="stroke-guide-header">
+        <div style="font-size:13px; color:#888; font-weight:600;">획순 가이드</div>
+        <div class="case-toggle">
+          <button class="case-btn ${writingState.isUpperCase ? 'active' : ''}" onclick="toggleCase(true)">ABC</button>
+          <button class="case-btn ${!writingState.isUpperCase ? 'active' : ''}" onclick="toggleCase(false)">abc</button>
+        </div>
+      </div>
       <div class="stroke-letters" id="strokeLetters">
-        ${w.english.toUpperCase().split('').map((ch, i) => `
+        ${displayWord.split('').map((ch, i) => `
           <div class="stroke-letter" id="strokeLetter_${i}">
             ${ch}
             <div class="order-badge">${i+1}</div>
@@ -1470,7 +1493,7 @@ function renderWritingRound() {
       </div>
       <div class="canvas-container">
         <canvas id="writingCanvas"></canvas>
-        <div class="canvas-guide-text" id="guideText">${w.english.toUpperCase()}</div>
+        <div class="canvas-guide-text" id="guideText">${displayWord}</div>
       </div>
     </div>
 
@@ -1479,6 +1502,11 @@ function renderWritingRound() {
 
   initCanvas();
   animateStrokeGuide();
+}
+
+function toggleCase(upper) {
+  writingState.isUpperCase = upper;
+  renderWritingRound();
 }
 
 function animateStrokeGuide() {
@@ -1640,9 +1668,9 @@ function renderStats() {
   const container = document.getElementById('statsContent');
   container.innerHTML = `
     <div class="stats-date-nav">
-      <button onclick="changeStatsDate(-1)">◀</button>
+      <button onclick="changeStatsDate(-1)" title="이전 날">◀ 이전</button>
       <div class="stats-date-label" id="statsDateLabel">${formatDate(statsDate)}</div>
-      <button onclick="changeStatsDate(1)">▶</button>
+      <button onclick="changeStatsDate(1)" title="다음 날">다음 ▶</button>
     </div>
     <div id="statsBody"><div style="text-align:center; color:white; padding:40px; font-size:16px;">불러오는 중...</div></div>
   `;
