@@ -637,6 +637,194 @@
   .quiz-option-english.correct { background: #DCFCE7; border-color: var(--grass); color: #166534; }
   .quiz-option-english.wrong { background: #FFF0F0; border-color: var(--coral); color: #991B1B; }
   .quiz-option-english:disabled { cursor: not-allowed; }
+
+  /* Writing Practice */
+  .writing-word-select {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-bottom: 16px;
+  }
+  .writing-word-btn {
+    background: white; border: 2.5px solid #E8E8E8;
+    border-radius: 16px; padding: 14px 10px;
+    font-family: 'Fredoka One', cursive; font-size: 18px;
+    color: var(--ink); cursor: pointer;
+    transition: all 0.2s; text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+  .writing-word-btn:hover { border-color: #764ba2; transform: translateY(-2px); }
+  .writing-word-btn.selected { border-color: #764ba2; background: #f3e8ff; color: #764ba2; }
+
+  .repeat-selector { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .repeat-btn {
+    flex: 1; min-width: 48px;
+    padding: 10px 6px; border-radius: 12px;
+    border: 2px solid #E8E8E8; background: white;
+    font-family: 'Fredoka One', cursive; font-size: 16px;
+    color: #888; cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .repeat-btn.selected { border-color: #764ba2; background: #764ba2; color: white; }
+
+  .stroke-guide {
+    background: white; border-radius: 20px;
+    padding: 16px; margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  .stroke-letters {
+    display: flex; gap: 8px; justify-content: center;
+    flex-wrap: wrap; margin-top: 8px;
+  }
+  .stroke-letter {
+    width: 44px; height: 52px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center;
+    font-family: 'Fredoka One', cursive; font-size: 26px;
+    color: white; box-shadow: 0 4px 12px rgba(118,75,162,0.3);
+    position: relative;
+  }
+  .stroke-letter .order-badge {
+    position: absolute; top: -6px; right: -6px;
+    width: 18px; height: 18px; background: var(--sun);
+    border-radius: 50%; font-size: 10px; font-weight: 800;
+    color: var(--ink); display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .canvas-wrap {
+    background: white; border-radius: 20px;
+    padding: 16px; margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+  .canvas-label {
+    font-family: 'Fredoka One', cursive; font-size: 16px;
+    color: #764ba2; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #writingCanvas {
+    width: 100%; height: 180px;
+    border: 2.5px dashed #C4B5FD; border-radius: 14px;
+    cursor: crosshair; display: block;
+    background: #fafafa;
+    touch-action: none;
+  }
+  .canvas-guide-text {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Fredoka One', cursive; font-size: 48px;
+    color: rgba(118,75,162,0.08); pointer-events: none;
+    white-space: nowrap;
+  }
+  .canvas-container { position: relative; }
+
+  .result-badge {
+    text-align: center; padding: 20px;
+    border-radius: 20px; margin-bottom: 12px;
+  }
+  .result-badge.pass { background: #DCFCE7; }
+  .result-badge.fail { background: #FFF0F0; }
+  .result-badge .result-icon { font-size: 48px; margin-bottom: 6px; }
+  .result-badge .result-text { font-family: 'Fredoka One', cursive; font-size: 28px; }
+  .result-badge .result-score { font-size: 16px; color: #555; margin-top: 4px; }
+
+  .progress-rounds {
+    display: flex; gap: 8px; margin-bottom: 14px; justify-content: center;
+  }
+  .round-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; font-family: 'Nunito', sans-serif;
+    border: 2.5px solid #E8E8E8; color: #aaa; background: white;
+    transition: all 0.3s;
+  }
+  .round-dot.pass { background: #DCFCE7; border-color: var(--grass); color: #166534; }
+  .round-dot.fail { background: #FFF0F0; border-color: var(--coral); color: #991B1B; }
+  .round-dot.current { border-color: #764ba2; color: #764ba2; background: #f3e8ff; }
+
+  /* Stats */
+  .stats-header { margin-bottom: 16px; }
+  .stats-date-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.15); border-radius: 16px;
+    padding: 10px 16px; margin-bottom: 12px;
+  }
+  .stats-date-nav button {
+    background: rgba(255,255,255,0.3); border: none;
+    border-radius: 10px; width: 36px; height: 36px;
+    color: white; font-size: 18px; cursor: pointer;
+  }
+  .stats-date-label { font-family: 'Fredoka One', cursive; font-size: 18px; color: white; }
+  .stats-summary {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .stats-card {
+    background: white; border-radius: 16px;
+    padding: 14px 10px; text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .stats-num { font-family: 'Fredoka One', cursive; font-size: 28px; color: #764ba2; }
+  .stats-lbl { font-size: 11px; color: #888; font-weight: 600; margin-top: 2px; }
+  .stats-word-row {
+    background: white; border-radius: 14px;
+    padding: 12px 16px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  }
+  .stats-word-emoji { font-size: 28px; }
+  .stats-word-info { flex: 1; }
+  .stats-word-name { font-family: 'Fredoka One', cursive; font-size: 18px; color: var(--ink); }
+  .stats-word-detail { font-size: 12px; color: #888; margin-top: 2px; }
+  .stats-pass-rate {
+    font-family: 'Fredoka One', cursive; font-size: 16px;
+  }
+  .stats-bar-wrap { height: 6px; background: #F0F0F0; border-radius: 3px; margin-top: 4px; }
+  .stats-bar { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.5s; }
+
+  /* Stats Page */
+  .stats-date-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px; padding: 10px 16px;
+  }
+  .stats-date-nav button {
+    background: white; border: none; border-radius: 12px;
+    width: 36px; height: 36px; font-size: 16px;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
+  .stats-date-nav button:hover { transform: scale(1.1); }
+  .stats-date-label {
+    font-family: 'Fredoka One', cursive; font-size: 20px; color: white;
+  }
+  .stats-summary {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 16px;
+  }
+  .stats-card {
+    background: white; border-radius: 18px; padding: 14px 8px;
+    text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .stats-num {
+    font-family: 'Fredoka One', cursive; font-size: 28px; color: #764ba2;
+  }
+  .stats-lbl { font-size: 11px; color: #888; font-weight: 700; margin-top: 2px; }
+  .stats-word-row {
+    background: white; border-radius: 18px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .stats-word-emoji { font-size: 32px; flex-shrink: 0; }
+  .stats-word-info { flex: 1; min-width: 0; }
+  .stats-word-name { font-family: 'Fredoka One', cursive; font-size: 18px; color: var(--ink); }
+  .stats-word-detail { font-size: 12px; color: #888; margin-top: 2px; }
+  .stats-bar-wrap {
+    height: 6px; background: #EEE; border-radius: 10px;
+    margin-top: 6px; overflow: hidden;
+  }
+  .stats-bar { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 10px; transition: width 0.6s ease; }
+  .stats-pass-rate { font-family: 'Fredoka One', cursive; font-size: 18px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -649,7 +837,7 @@
     <div class="word-count-badge" id="wordCountBadge">0개</div>
   </div>
 
-  <div class="nav-tabs">
+  <div class="nav-tabs" style="display:grid; grid-template-columns: repeat(6, 1fr);">
     <button class="nav-tab active" onclick="showPage('wordList')">
       <span class="tab-icon">📚</span>단어장
     </button>
@@ -661,6 +849,12 @@
     </button>
     <button class="nav-tab" onclick="showPage('quiz')">
       <span class="tab-icon">🏆</span>테스트
+    </button>
+    <button class="nav-tab" onclick="showPage('writing')">
+      <span class="tab-icon">✏️</span>쓰기
+    </button>
+    <button class="nav-tab" onclick="showPage('stats')">
+      <span class="tab-icon">📊</span>통계
     </button>
   </div>
 
@@ -722,6 +916,16 @@
   <!-- Quiz Page -->
   <div class="page" id="page-quiz">
     <div id="quizContent"></div>
+  </div>
+
+  <!-- Writing Page -->
+  <div class="page" id="page-writing">
+    <div id="writingContent"></div>
+  </div>
+
+  <!-- Stats Page -->
+  <div class="page" id="page-stats">
+    <div id="statsContent"></div>
   </div>
 </div>
 
@@ -806,11 +1010,14 @@ function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
-  document.querySelectorAll('.nav-tab')[['wordList','addWord','study','quiz'].indexOf(page)].classList.add('active');
+  const pages = ['wordList','addWord','study','quiz','writing','stats'];
+  document.querySelectorAll('.nav-tab')[pages.indexOf(page)].classList.add('active');
   currentPage = page;
   if (page === 'wordList') renderWordList();
   if (page === 'study') renderStudy();
   if (page === 'quiz') initQuiz();
+  if (page === 'writing') renderWriting();
+  if (page === 'stats') renderStats();
 }
 
 // ============ WORD LIST ============
@@ -1174,7 +1381,339 @@ function answerQuiz(btn, chosen, answer) {
   }, 1600);
 }
 
-// ============ TTS ============
+// ============ WRITING PRACTICE ============
+let writingState = {
+  word: null, totalRounds: 3, currentRound: 0,
+  results: [], isDrawing: false, strokes: [], lastX: 0, lastY: 0
+};
+
+function renderWriting() {
+  const container = document.getElementById('writingContent');
+  if (words.length === 0) {
+    container.innerHTML = `<div class="no-words-study"><div class="big-icon">✏️</div><p style="font-family:'Fredoka One',cursive;font-size:22px;">단어를 먼저 추가해요!</p></div>`;
+    return;
+  }
+  container.innerHTML = `
+    <div class="card">
+      <div class="section-title">📝 단어 선택</div>
+      <div class="writing-word-select" id="writingWordSelect">
+        ${words.map(w => `
+          <button class="writing-word-btn ${writingState.word?.english === w.english ? 'selected' : ''}"
+            onclick="selectWritingWord('${w.english}')">
+            ${w.emoji || '📝'} ${w.english}
+          </button>
+        `).join('')}
+      </div>
+      <div class="section-title" style="margin-top:8px;">🔁 반복 횟수</div>
+      <div class="repeat-selector">
+        ${[1,2,3,4,5].map(n => `
+          <button class="repeat-btn ${writingState.totalRounds === n ? 'selected' : ''}"
+            onclick="selectRepeat(${n})">${n}번</button>
+        `).join('')}
+      </div>
+      <button class="btn-primary" onclick="startWriting()" ${!writingState.word ? 'disabled' : ''}>
+        ✏️ 쓰기 시작!
+      </button>
+    </div>
+  `;
+}
+
+function selectWritingWord(english) {
+  writingState.word = words.find(w => w.english === english);
+  renderWriting();
+}
+
+function selectRepeat(n) {
+  writingState.totalRounds = n;
+  renderWriting();
+}
+
+function startWriting() {
+  if (!writingState.word) return;
+  writingState.currentRound = 0;
+  writingState.results = [];
+  renderWritingRound();
+}
+
+function renderWritingRound() {
+  const w = writingState.word;
+  const round = writingState.currentRound;
+  const total = writingState.totalRounds;
+  const container = document.getElementById('writingContent');
+
+  const roundDots = Array.from({length: total}, (_, i) => {
+    let cls = '';
+    if (i < writingState.results.length) cls = writingState.results[i] ? 'pass' : 'fail';
+    else if (i === round) cls = 'current';
+    return `<div class="round-dot ${cls}">${i+1}</div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="stroke-guide">
+      <div style="font-size:13px; color:#888; font-weight:600; margin-bottom:6px;">획순 가이드</div>
+      <div class="stroke-letters" id="strokeLetters">
+        ${w.english.toUpperCase().split('').map((ch, i) => `
+          <div class="stroke-letter" id="strokeLetter_${i}">
+            ${ch}
+            <div class="order-badge">${i+1}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="progress-rounds">${roundDots}</div>
+
+    <div class="canvas-wrap">
+      <div class="canvas-label">
+        <span>${round+1}번째 쓰기 / ${total}번</span>
+        <button onclick="clearCanvas()" style="background:#FFF0F0; border:none; border-radius:10px; padding:6px 12px; font-size:13px; color:var(--coral); cursor:pointer; font-weight:700;">지우기</button>
+      </div>
+      <div class="canvas-container">
+        <canvas id="writingCanvas"></canvas>
+        <div class="canvas-guide-text" id="guideText">${w.english.toUpperCase()}</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="submitWriting()">✅ 제출하기</button>
+  `;
+
+  initCanvas();
+  animateStrokeGuide();
+}
+
+function animateStrokeGuide() {
+  const w = writingState.word;
+  const letters = w.english.toUpperCase().split('');
+  letters.forEach((_, i) => {
+    setTimeout(() => {
+      document.querySelectorAll('.stroke-letter').forEach((el, j) => {
+        el.style.transform = j === i ? 'scale(1.25)' : 'scale(1)';
+        el.style.boxShadow = j === i ? '0 8px 20px rgba(118,75,162,0.5)' : '';
+      });
+    }, i * 400);
+    setTimeout(() => {
+      document.querySelectorAll('.stroke-letter').forEach(el => {
+        el.style.transform = 'scale(1)';
+        el.style.boxShadow = '';
+      });
+    }, w.english.length * 400 + 200);
+  });
+}
+
+function initCanvas() {
+  const canvas = document.getElementById('writingCanvas');
+  if (!canvas) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width - 32;
+  canvas.height = 180;
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#764ba2';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  writingState.strokes = [];
+  writingState.currentStroke = [];
+
+  const getPos = (e) => {
+    const r = canvas.getBoundingClientRect();
+    const touch = e.touches ? e.touches[0] : e;
+    return { x: touch.clientX - r.left, y: touch.clientY - r.top };
+  };
+
+  canvas.onmousedown = canvas.ontouchstart = (e) => {
+    e.preventDefault();
+    writingState.isDrawing = true;
+    writingState.currentStroke = [];
+    const pos = getPos(e);
+    writingState.lastX = pos.x; writingState.lastY = pos.y;
+    writingState.currentStroke.push(pos);
+  };
+  canvas.onmousemove = canvas.ontouchmove = (e) => {
+    e.preventDefault();
+    if (!writingState.isDrawing) return;
+    const pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(writingState.lastX, writingState.lastY);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    writingState.lastX = pos.x; writingState.lastY = pos.y;
+    writingState.currentStroke.push(pos);
+  };
+  canvas.onmouseup = canvas.ontouchend = () => {
+    writingState.isDrawing = false;
+    if (writingState.currentStroke.length > 0) {
+      writingState.strokes.push([...writingState.currentStroke]);
+    }
+  };
+}
+
+function clearCanvas() {
+  const canvas = document.getElementById('writingCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  writingState.strokes = [];
+}
+
+function submitWriting() {
+  const canvas = document.getElementById('writingCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  // Count non-white pixels
+  let drawn = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i+3] > 10) drawn++;
+  }
+  const totalPixels = canvas.width * canvas.height;
+  const coverage = drawn / totalPixels;
+
+  // Stroke count vs expected letters
+  const expectedStrokes = writingState.word.english.length;
+  const actualStrokes = writingState.strokes.length;
+  const strokeScore = Math.min(actualStrokes / expectedStrokes, 1);
+
+  // Coverage score (enough ink)
+  const coverageScore = Math.min(coverage / 0.05, 1);
+
+  // Combined score
+  const score = Math.round((strokeScore * 0.6 + coverageScore * 0.4) * 100);
+  const pass = score >= 70;
+
+  writingState.results.push(pass);
+
+  // Save to Firebase
+  const today = new Date().toISOString().slice(0, 10);
+  const practiceRef = firebase.database().ref(`practice/${today}/${writingState.word.english}`);
+  practiceRef.transaction(current => {
+    const cur = current || { total: 0, pass: 0, fail: 0 };
+    return { total: cur.total + 1, pass: cur.pass + (pass ? 1 : 0), fail: cur.fail + (pass ? 0 : 1) };
+  });
+
+  showWritingResult(score, pass);
+}
+
+function showWritingResult(score, pass) {
+  const container = document.getElementById('writingContent');
+  const round = writingState.currentRound;
+  const total = writingState.totalRounds;
+  const isLast = round + 1 >= total;
+
+  const roundDots = Array.from({length: total}, (_, i) => {
+    let cls = '';
+    if (i < writingState.results.length) cls = writingState.results[i] ? 'pass' : 'fail';
+    else if (i === round + 1 && !isLast) cls = 'current';
+    return `<div class="round-dot ${cls}">${i+1}</div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="result-badge ${pass ? 'pass' : 'fail'}">
+      <div class="result-icon">${pass ? '🎉' : '😅'}</div>
+      <div class="result-text" style="color:${pass ? '#166534' : '#991B1B'}">${pass ? 'PASS!' : 'FAIL'}</div>
+      <div class="result-score">유사도 ${score}% ${pass ? '👏' : '— 다시 해봐요!'}</div>
+    </div>
+    <div class="progress-rounds">${roundDots}</div>
+    ${isLast ? `
+      <div class="card" style="text-align:center; padding:20px;">
+        <div style="font-family:'Fredoka One',cursive; font-size:22px; margin-bottom:8px;">
+          ${writingState.results.filter(Boolean).length}/${total} 통과! ${writingState.results.filter(Boolean).length >= Math.ceil(total/2) ? '🌟' : '💪'}
+        </div>
+        <button class="btn-primary" onclick="renderWriting()">다시 선택하기</button>
+      </div>
+    ` : `
+      <button class="btn-primary" onclick="nextWritingRound()">다음 쓰기 →</button>
+    `}
+  `;
+}
+
+function nextWritingRound() {
+  writingState.currentRound++;
+  renderWritingRound();
+}
+
+// ============ STATS ============
+let statsDate = new Date().toISOString().slice(0, 10);
+
+function renderStats() {
+  const container = document.getElementById('statsContent');
+  container.innerHTML = `
+    <div class="stats-date-nav">
+      <button onclick="changeStatsDate(-1)">◀</button>
+      <div class="stats-date-label" id="statsDateLabel">${formatDate(statsDate)}</div>
+      <button onclick="changeStatsDate(1)">▶</button>
+    </div>
+    <div id="statsBody"><div style="text-align:center; color:white; padding:40px; font-size:16px;">불러오는 중...</div></div>
+  `;
+  loadStats();
+}
+
+function formatDate(d) {
+  const date = new Date(d);
+  return `${date.getMonth()+1}월 ${date.getDate()}일`;
+}
+
+function changeStatsDate(dir) {
+  const d = new Date(statsDate);
+  d.setDate(d.getDate() + dir);
+  statsDate = d.toISOString().slice(0, 10);
+  document.getElementById('statsDateLabel').textContent = formatDate(statsDate);
+  loadStats();
+}
+
+function loadStats() {
+  firebase.database().ref(`practice/${statsDate}`).once('value', snapshot => {
+    const data = snapshot.val() || {};
+    const body = document.getElementById('statsBody');
+    const entries = Object.entries(data);
+
+    if (entries.length === 0) {
+      body.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.7); padding:40px;">
+        <div style="font-size:48px; margin-bottom:12px;">📭</div>
+        <div style="font-family:'Fredoka One',cursive; font-size:18px;">이 날은 연습 기록이 없어요</div>
+      </div>`;
+      return;
+    }
+
+    const totalWords = entries.length;
+    const totalPractice = entries.reduce((s, [,v]) => s + v.total, 0);
+    const totalPass = entries.reduce((s, [,v]) => s + v.pass, 0);
+
+    body.innerHTML = `
+      <div class="stats-summary">
+        <div class="stats-card">
+          <div class="stats-num">${totalWords}</div>
+          <div class="stats-lbl">연습 단어</div>
+        </div>
+        <div class="stats-card">
+          <div class="stats-num">${totalPractice}</div>
+          <div class="stats-lbl">총 연습 횟수</div>
+        </div>
+        <div class="stats-card">
+          <div class="stats-num">${totalPractice > 0 ? Math.round(totalPass/totalPractice*100) : 0}%</div>
+          <div class="stats-lbl">통과율</div>
+        </div>
+      </div>
+      ${entries.map(([eng, v]) => {
+        const w = words.find(w => w.english === eng) || { emoji: '📝', english: eng, korean: '' };
+        const passRate = v.total > 0 ? Math.round(v.pass / v.total * 100) : 0;
+        return `
+          <div class="stats-word-row">
+            <div class="stats-word-emoji">${w.emoji || '📝'}</div>
+            <div class="stats-word-info">
+              <div class="stats-word-name">${eng}</div>
+              <div class="stats-word-detail">${v.total}회 연습 · ${v.pass}번 통과 · ${v.fail}번 실패</div>
+              <div class="stats-bar-wrap"><div class="stats-bar" style="width:${passRate}%"></div></div>
+            </div>
+            <div class="stats-pass-rate" style="color:${passRate >= 70 ? 'var(--grass)' : 'var(--coral)'}">${passRate}%</div>
+          </div>
+        `;
+      }).join('')}
+    `;
+  });
+}
+
 let ttsUnlocked = false;
 
 function unlockTTS() {
