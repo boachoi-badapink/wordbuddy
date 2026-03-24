@@ -251,7 +251,29 @@
   }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   .auto-fill-preview.show { display: block; }
-  .preview-emoji { font-size: 48px; text-align: center; margin-bottom: 8px; }
+  .preview-emoji-wrap {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 8px;
+  }
+  .preview-emoji { font-size: 48px; text-align: center; }
+  .preview-emoji-custom img {
+    width: 72px; height: 72px; border-radius: 16px;
+    object-fit: cover; border: 2px solid #BAE6FD;
+  }
+  .emoji-actions {
+    display: flex; gap: 8px; margin-top: 8px;
+  }
+  .emoji-action-btn {
+    background: white; border: 2px solid #E8E8E8;
+    border-radius: 12px; width: 44px; height: 44px;
+    font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .emoji-action-btn:hover { border-color: #764ba2; transform: scale(1.1); }
+  .emoji-action-btn.spinning { animation: spin 0.6s linear; }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .preview-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .preview-label { font-size: 12px; color: #666; font-weight: 600; }
   .preview-value { font-size: 15px; color: var(--ink); font-weight: 700; }
@@ -902,7 +924,19 @@
       </div>
 
       <div class="auto-fill-preview" id="autoFillPreview">
-        <div class="preview-emoji" id="previewEmoji">🔄</div>
+        <div class="preview-emoji-wrap">
+          <div class="preview-emoji" id="previewEmoji">🔄</div>
+          <div class="preview-emoji-custom" id="previewEmojiCustom" style="display:none">
+            <img id="previewEmojiImg" src="" alt="custom">
+          </div>
+          <div class="emoji-actions" id="emojiActions" style="display:none">
+            <button class="emoji-action-btn" onclick="refreshEmoji()" title="다른 그림으로">🔄</button>
+            <label class="emoji-action-btn" title="직접 사진 등록" style="cursor:pointer">
+              📷
+              <input type="file" id="emojiImageInput" accept="image/*" style="display:none" onchange="handleEmojiImageUpload(event)">
+            </label>
+          </div>
+        </div>
         <div class="preview-row">
           <span class="preview-label">발음</span>
           <span class="preview-value" id="previewPronunciation"><span class="loading-dots"></span></span>
@@ -1035,6 +1069,11 @@ function showPage(page) {
 // ============ WORD LIST ============
 const colorClasses = ['color-0','color-1','color-2','color-3','color-4'];
 
+function wordPicture(w, size = 40) {
+  if (w.customImage) return `<img src="${w.customImage}" style="width:${size}px;height:${size}px;border-radius:${size/4}px;object-fit:cover;">`;
+  return w.emoji || '📝';
+}
+
 function renderWordList() {
   const container = document.getElementById('wordListContainer');
   if (words.length === 0) {
@@ -1048,9 +1087,12 @@ function renderWordList() {
   }
   container.innerHTML = words.map((w, i) => {
     const dateStr = w.createdAt ? new Date(w.createdAt).toLocaleDateString('ko-KR', {month:'numeric', day:'numeric'}) : '';
+    const emojiHtml = w.customImage
+      ? `<img src="${w.customImage}" style="width:40px;height:40px;border-radius:10px;object-fit:cover;">`
+      : (w.emoji || '📝');
     return `
     <div class="word-item ${colorClasses[i % 5]}" onclick="speakWord('${w.english}')">
-      <div class="word-emoji-box">${w.emoji || '📝'}</div>
+      <div class="word-emoji-box">${emojiHtml}</div>
       <div class="word-info">
         <div class="word-english">${w.english}</div>
         <div class="word-pronunciation">${w.pronunciation || ''}</div>
@@ -1105,11 +1147,15 @@ function onWordInput(value) {
 
   if (!value.trim() || value.trim().length < 2) {
     preview.classList.remove('show');
+    document.getElementById('emojiActions').style.display = 'none';
     return;
   }
 
   preview.classList.add('show');
   document.getElementById('previewEmoji').textContent = '🔄';
+  document.getElementById('previewEmojiCustom').style.display = 'none';
+  document.getElementById('previewEmoji').style.display = 'block';
+  document.getElementById('emojiActions').style.display = 'none';
   document.getElementById('previewPronunciation').innerHTML = '<span class="loading-dots"></span>';
   document.getElementById('previewKorean').innerHTML = '<span class="loading-dots"></span>';
 
@@ -1120,6 +1166,7 @@ function onWordInput(value) {
       document.getElementById('previewEmoji').textContent = data.emoji || '📝';
       document.getElementById('previewPronunciation').textContent = data.pronunciation || '-';
       document.getElementById('previewKorean').textContent = data.korean || '-';
+      document.getElementById('emojiActions').style.display = 'flex';
       addBtn.disabled = false;
     } catch (e) {
       document.getElementById('previewEmoji').textContent = '⚠️';
@@ -1127,6 +1174,55 @@ function onWordInput(value) {
       document.getElementById('previewKorean').textContent = '다시 시도해주세요';
     }
   }, 800);
+}
+
+async function refreshEmoji() {
+  if (!pendingWord) return;
+  const btn = document.querySelector('.emoji-action-btn');
+  btn.classList.add('spinning');
+  document.getElementById('previewEmoji').textContent = '🔄';
+  document.getElementById('previewEmojiCustom').style.display = 'none';
+  document.getElementById('previewEmoji').style.display = 'block';
+
+  try {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 100,
+        messages: [{
+          role: 'user',
+          content: `영어 단어 "${pendingWord.english}"를 나타내는 이모지를 1개만 출력해줘. 방금 쓴 것(${pendingWord.emoji})과 다른 이모지로. JSON: {"emoji":"이모지"} 형식으로만.`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(c => c.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    pendingWord.emoji = parsed.emoji || pendingWord.emoji;
+    pendingWord.customImage = null;
+    document.getElementById('previewEmoji').textContent = pendingWord.emoji;
+  } catch(e) {
+    showToast('다시 시도해주세요 🔄');
+  }
+  btn.classList.remove('spinning');
+}
+
+function handleEmojiImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file || !pendingWord) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    pendingWord.customImage = e.target.result;
+    pendingWord.emoji = '🖼️';
+    document.getElementById('previewEmoji').style.display = 'none';
+    document.getElementById('previewEmojiCustom').style.display = 'block';
+    document.getElementById('previewEmojiImg').src = e.target.result;
+    showToast('사진이 등록됐어요! 📷');
+  };
+  reader.readAsDataURL(file);
 }
 
 async function addWordManually() {
@@ -1231,8 +1327,8 @@ function renderStudy(keepFlip) {
   const w = words[studyIndex];
   const pct = ((studyIndex+1)/words.length*100).toFixed(0);
 
-  const emojiFront = studyShowPicture ? `<div class="study-emoji">${w.emoji || '📝'}</div>` : '';
-  const emojiBack  = studyShowPicture ? `<div class="study-emoji">${w.emoji || '📝'}</div>` : '';
+  const emojiFront = studyShowPicture ? `<div class="study-emoji">${wordPicture(w, 80)}</div>` : '';
+  const emojiBack  = studyShowPicture ? `<div class="study-emoji">${wordPicture(w, 80)}</div>` : '';
   const speakerBtn = studyPlaySound
     ? `<button class="study-btn btn-speak-big" onclick="speakWord('${w.english}')">🔊</button>`
     : `<button class="study-btn btn-speak-big" style="opacity:0.35;cursor:not-allowed" disabled>🔇</button>`;
@@ -1361,7 +1457,7 @@ function renderQuiz() {
       </div>
     </div>
     <div class="quiz-question">
-      <div class="quiz-picture-box">${curr.word.emoji || '📝'}</div>
+      <div class="quiz-picture-box">${wordPicture(curr.word, 80)}</div>
       <div class="quiz-prompt" style="font-size:15px; color:#777; font-weight:700; margin-bottom:4px;">이 그림의 영어 단어는?</div>
       <div style="font-size:15px; color:#aaa; font-style:italic;">${curr.word.korean}</div>
     </div>
