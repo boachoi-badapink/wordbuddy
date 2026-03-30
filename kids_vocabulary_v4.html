@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌈 My English Words!</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sunshine: #FFD93D;
+  --coral:    #FF6B6B;
+  --peach:    #FFA552;
+  --lavender: #A78BFA;
+  --mint:     #5DD6C0;
+  --pink:     #F472B6;
+  --grass:    #72C472;
+  --sky:      #60C3F5;
+  --dark:     #2D1B69;
+  --card-shadow: 0 12px 40px rgba(45,27,105,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(145deg, #74C0FC 0%, #B8E0FF 30%, #C5F0A4 65%, #FFFBE8 100%);
+  overflow-x: hidden;
+}
+
+.bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.bg-shapes i {
+  position: absolute; border-radius: 50%; opacity: .15;
+  animation: floatUp linear infinite;
+}
+.bg-shapes i:nth-child(1){width:110px;height:110px;background:#FFD93D;left:4%;animation-duration:20s;}
+.bg-shapes i:nth-child(2){width:75px;height:75px;background:#FF6B6B;left:18%;animation-duration:26s;animation-delay:-9s;}
+.bg-shapes i:nth-child(3){width:55px;height:55px;background:#A78BFA;left:42%;animation-duration:16s;animation-delay:-4s;}
+.bg-shapes i:nth-child(4){width:95px;height:95px;background:#5DD6C0;left:63%;animation-duration:22s;animation-delay:-13s;}
+.bg-shapes i:nth-child(5){width:65px;height:65px;background:#F472B6;left:78%;animation-duration:18s;animation-delay:-6s;}
+.bg-shapes i:nth-child(6){width:45px;height:45px;background:#FFA552;left:88%;animation-duration:28s;animation-delay:-15s;}
+@keyframes floatUp { 0%{bottom:-150px;transform:rotate(0)} 100%{bottom:110%;transform:rotate(360deg)} }
+
+.app { position: relative; z-index: 10; max-width: 860px; margin: 0 auto; padding: 14px 13px 90px; }
+
+/* ── Header ── */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: white; border-radius: 28px; padding: 13px 20px;
+  box-shadow: var(--card-shadow); margin-bottom: 12px;
+}
+.header h1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.4rem,5vw,2.2rem);
+  background: linear-gradient(135deg,#FF6B6B,#A78BFA,#5DD6C0);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.header p { font-size:.78rem; color:#bbb; font-weight:700; margin-top:2px; }
+.stars-pill {
+  background: linear-gradient(135deg,#FFD93D,#FFA552);
+  border-radius:20px; padding:8px 16px;
+  display:flex; align-items:center; gap:6px;
+  box-shadow:0 4px 14px rgba(255,169,82,.4); flex-shrink:0;
+}
+.stars-pill .sc { font-family:'Fredoka One',cursive; font-size:1.5rem; color:white; }
+.stars-pill .sl { font-size:.7rem; color:rgba(255,255,255,.9); font-weight:800; }
+
+/* ── Nav ── */
+.nav-box {
+  background:white; border-radius:24px; padding:13px 15px;
+  box-shadow:var(--card-shadow); margin-bottom:12px;
+  display:flex; flex-direction:column; gap:10px;
+}
+.cat-row { display:flex; gap:7px; overflow-x:auto; scrollbar-width:none; }
+.cat-row::-webkit-scrollbar { display:none; }
+.ctab {
+  flex-shrink:0; background:#f4f4f8; border:2px solid transparent;
+  border-radius:15px; padding:7px 15px;
+  font-family:'Fredoka One',cursive; font-size:.9rem;
+  cursor:pointer; transition:all .2s; color:#aaa; white-space:nowrap;
+}
+.ctab:hover { transform:translateY(-2px); background:#ede9fe; color:var(--dark); }
+.ctab.active { color:white; transform:translateY(-2px); }
+.ctab[data-c="animals"].active { background:var(--coral); }
+.ctab[data-c="fruits"].active  { background:var(--peach); }
+.ctab[data-c="colors"].active  { background:var(--lavender); }
+.ctab[data-c="objects"].active { background:var(--mint); }
+.ctab[data-c="custom"].active  { background:var(--pink); }
+
+.mode-row { display:flex; gap:7px; }
+.mbtn {
+  flex:1; background:#f4f4f8; border:2px solid transparent;
+  border-radius:13px; padding:8px 4px;
+  font-family:'Fredoka One',cursive; font-size:.9rem;
+  cursor:pointer; transition:all .2s; color:#aaa;
+}
+.mbtn:hover { background:#ede9fe; color:var(--dark); }
+.mbtn.active { background:var(--dark); color:var(--sunshine); }
+
+/* ── Progress ── */
+.prog-wrap { margin-bottom:12px; }
+.prog-bar { background:rgba(255,255,255,.6); border-radius:10px; height:11px; overflow:hidden; }
+.prog-fill { height:100%; background:linear-gradient(90deg,var(--grass),var(--sunshine)); border-radius:10px; transition:width .4s ease; }
+.prog-meta { display:flex; justify-content:space-between; margin-top:4px; }
+.prog-meta span { font-size:.75rem; font-weight:800; color:rgba(45,27,105,.65); }
+
+/* ══════════════════════════════════════
+   LEARN MODE
+══════════════════════════════════════ */
+#learn-panel { display:block; }
+
+.flashcard-stage {
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+
+/* Controls row: sub-mode pills + image toggle */
+.controls-row {
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+  gap:10px; width:100%;
+}
+
+.submode-row {
+  display:flex; gap:6px; background:white;
+  border-radius:18px; padding:6px 8px;
+  box-shadow:0 3px 12px rgba(0,0,0,.09);
+}
+.smbtn {
+  background:#f4f4f8; border:2px solid transparent;
+  border-radius:12px; padding:6px 12px;
+  font-family:'Fredoka One',cursive; font-size:.88rem;
+  cursor:pointer; transition:all .18s; color:#aaa;
+}
+.smbtn:hover { background:#ede9fe; color:var(--dark); }
+.smbtn.active { background:var(--lavender); color:white; }
+
+/* Image toggle */
+.img-toggle-wrap {
+  display:flex; align-items:center; gap:8px;
+  background:white; border-radius:18px; padding:8px 14px;
+  box-shadow:0 3px 12px rgba(0,0,0,.09);
+  font-family:'Fredoka One',cursive; font-size:.88rem;
+  color:rgba(45,27,105,.5); cursor:pointer;
+}
+.toggle-switch { position:relative; width:40px; height:22px; display:inline-block; flex-shrink:0; }
+.toggle-switch input { display:none; }
+.toggle-track {
+  position:absolute; inset:0; background:#ddd; border-radius:11px;
+  cursor:pointer; transition:background .2s;
+}
+.toggle-switch input:checked + .toggle-track { background:var(--lavender); }
+.toggle-track::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:16px; height:16px; border-radius:50%; background:white;
+  transition:transform .2s; box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.toggle-switch input:checked + .toggle-track::after { transform:translateX(18px); }
+
+/* Card counter + dots */
+.card-counter {
+  font-family:'Fredoka One',cursive; font-size:1rem; color:rgba(45,27,105,.55);
+  background:white; border-radius:14px; padding:5px 16px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+.dot-row { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; max-width:340px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#ddd; transition:all .3s; cursor:pointer; flex-shrink:0; }
+.dot.current { background:var(--lavender); transform:scale(1.4); }
+.dot.done    { background:var(--grass); }
+
+/* Flashcard */
+.flashcard-outer { width:100%; max-width:360px; perspective:1000px; cursor:pointer; }
+.flashcard-inner {
+  position:relative; width:100%; padding-top:105%;
+  transform-style:preserve-3d;
+  transition:transform .55s cubic-bezier(.4,0,.2,1);
+}
+.flashcard-inner.flipped { transform:rotateY(180deg); }
+.fc-face {
+  position:absolute; inset:0;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  border-radius:32px; box-shadow:var(--card-shadow);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; padding:22px; overflow:hidden;
+}
+.fc-front { background:white; }
+.fc-back  { background:linear-gradient(145deg,#F5F0FF,#EDE9FE); transform:rotateY(180deg); }
+
+/* Image area — hidden by default */
+.fc-img-area {
+  width:100%; flex:1; max-height:140px;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; border-radius:16px;
+  transition:all .35s ease;
+}
+.fc-img-area.img-hidden {
+  max-height:0; opacity:0; pointer-events:none; margin:0; padding:0;
+}
+.fc-emoji { font-size:5rem; line-height:1; transition:transform .3s; user-select:none; }
+.flashcard-outer:hover .fc-emoji { transform:scale(1.08) rotate(-4deg); }
+.fc-user-img { width:100%; height:100%; object-fit:contain; border-radius:14px; }
+
+.flip-hint {
+  position:absolute; bottom:10px; right:12px;
+  font-size:.68rem; font-weight:800; color:rgba(45,27,105,.28);
+  background:rgba(255,255,255,.7); border-radius:10px; padding:3px 8px;
+}
+
+/* Word display on front — big + small hint */
+.fc-word-block { display:flex; flex-direction:column; align-items:center; gap:5px; }
+.fc-word-big {
+  font-family:'Fredoka One',cursive; font-size:2.8rem; color:var(--dark);
+  letter-spacing:1px; line-height:1.1; text-align:center;
+}
+.fc-word-hint {
+  font-size:.85rem; font-weight:800; color:#c0b0e0;
+  min-height:1.1em; letter-spacing:.5px;
+}
+
+/* Back face */
+.fc-back .fc-korean { font-family:'Fredoka One',cursive; font-size:2.4rem; color:var(--dark); }
+.fc-back .fc-word-sm { font-size:1rem; color:#9580c8; font-weight:800; }
+.fc-back .fc-check-msg { font-size:.88rem; color:#aaa; font-weight:700; }
+
+/* Arrows */
+.arrow-row { display:flex; align-items:center; gap:16px; }
+.arrow-btn {
+  width:56px; height:56px; border-radius:50%; border:none; background:white;
+  box-shadow:var(--card-shadow); font-size:1.5rem; cursor:pointer;
+  transition:all .2s cubic-bezier(.34,1.56,.64,1); display:grid; place-items:center;
+}
+.arrow-btn:hover { transform:scale(1.15); }
+.arrow-btn:active { transform:scale(.92); }
+.arrow-btn:disabled { opacity:.35; cursor:default; transform:none; }
+.speak-fab {
+  background:linear-gradient(135deg,var(--sky),var(--lavender)); color:white;
+  border:none; border-radius:18px; padding:12px 22px;
+  font-family:'Fredoka One',cursive; font-size:1rem;
+  cursor:pointer; transition:all .2s; box-shadow:0 4px 16px rgba(96,195,245,.4);
+}
+.speak-fab:hover { transform:scale(1.06); }
+.learned-toggle {
+  background:white; border:3px solid #eee;
+  border-radius:18px; padding:10px 20px;
+  font-family:'Fredoka One',cursive; font-size:.95rem;
+  cursor:pointer; transition:all .2s; color:#bbb;
+}
+.learned-toggle.done { background:#ecfdf5; border-color:var(--grass); color:#166534; }
+
+@keyframes slideInRight{from{opacity:0;transform:translateX(60px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes slideInLeft {from{opacity:0;transform:translateX(-60px) scale(.9)}to{opacity:1;transform:none}}
+.slide-right { animation:slideInRight .35s cubic-bezier(.34,1.56,.64,1); }
+.slide-left  { animation:slideInLeft  .35s cubic-bezier(.34,1.56,.64,1); }
+
+/* ══════════════════════════════════════
+   QUIZ MODE
+══════════════════════════════════════ */
+#quiz-panel { display:none; }
+.quiz-wrap { max-width:480px; margin:0 auto; }
+.quiz-card {
+  background:white; border-radius:32px; padding:28px 20px 24px;
+  text-align:center; box-shadow:var(--card-shadow);
+  animation:slideInRight .3s ease;
+}
+.quiz-ctr { font-size:.78rem; font-weight:800; color:#ccc; margin-bottom:6px; }
+
+.quiz-submode-row {
+  display:flex; gap:7px; justify-content:center; margin-bottom:14px;
+  flex-wrap:wrap;
+}
+.qsmbtn {
+  background:#f4f4f8; border:2px solid transparent;
+  border-radius:12px; padding:6px 13px;
+  font-family:'Fredoka One',cursive; font-size:.85rem;
+  cursor:pointer; transition:all .18s; color:#aaa;
+}
+.qsmbtn:hover { background:#ede9fe; color:var(--dark); }
+.qsmbtn.active { background:var(--lavender); color:white; }
+
+.quiz-visual { margin-bottom:6px; }
+.quiz-emoji-big { font-size:4.8rem; display:block; animation:wiggle .6s ease; }
+.quiz-img-big { width:140px; height:140px; object-fit:contain; border-radius:18px; margin:0 auto; display:block; }
+.quiz-word-big {
+  font-family:'Fredoka One',cursive; font-size:3.2rem; color:var(--dark);
+  display:block; animation:wiggle .6s ease; letter-spacing:1px;
+}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg) scale(1.1)}75%{transform:rotate(8deg) scale(1.1)}}
+
+.quiz-hint { font-family:'Fredoka One',cursive; font-size:1rem; color:#bbb; margin-bottom:14px; }
+.quiz-opts { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.qopt {
+  background:#F8F7FF; border:3px solid #E5E3F8;
+  border-radius:16px; padding:13px 8px;
+  font-family:'Fredoka One',cursive; font-size:1.05rem;
+  cursor:pointer; transition:all .2s; color:var(--dark);
+}
+.qopt:hover:not(:disabled){ background:#EDE9FE; border-color:var(--lavender); transform:scale(1.04); }
+.qopt.correct{ background:#ECFDF5; border-color:var(--grass); color:#166534; }
+.qopt.wrong  { background:#FFF1F2; border-color:var(--coral); color:#9F1239; }
+.qopt:disabled{ cursor:default; }
+.quiz-fb { margin-top:12px; font-family:'Fredoka One',cursive; font-size:1rem; color:var(--dark); min-height:24px; }
+.quiz-nxt {
+  margin-top:14px; background:var(--sunshine); border:3px solid #E6B800;
+  border-radius:17px; padding:10px 26px;
+  font-family:'Fredoka One',cursive; font-size:1.05rem;
+  cursor:pointer; display:none; transition:all .2s; color:var(--dark);
+}
+.quiz-nxt:hover{ transform:scale(1.05); }
+.quiz-result { padding:14px; }
+.quiz-result .big-em{ font-size:4rem; display:block; }
+.quiz-result h2{ font-family:'Fredoka One',cursive; font-size:1.7rem; color:var(--dark); margin:8px 0 5px; }
+.quiz-result p{ color:#aaa; font-weight:700; margin-bottom:14px; }
+.retry-btn{ background:var(--coral); color:white; border:none; border-radius:14px; padding:10px 26px; font-family:'Fredoka One',cursive; font-size:1.1rem; cursor:pointer; }
+
+/* ══════════════════════════════════════
+   MOM PANEL
+══════════════════════════════════════ */
+#mom-panel { display:none; }
+.mom-card { background:white; border-radius:26px; padding:22px 18px; box-shadow:var(--card-shadow); margin-bottom:14px; }
+.mom-card h2{ font-family:'Fredoka One',cursive; font-size:1.3rem; color:var(--dark); margin-bottom:3px; }
+.mom-card .sub{ font-size:.78rem; color:#bbb; font-weight:700; margin-bottom:14px; }
+.add-form{ display:flex; flex-direction:column; gap:11px; }
+.form-row{ display:flex; gap:9px; align-items:flex-start; flex-wrap:wrap; }
+.emoji-wrap{ position:relative; }
+.emoji-disp{ width:54px; height:54px; background:#F8F7FF; border:3px solid #E5E3F8; border-radius:15px; font-size:2rem; display:grid; place-items:center; cursor:pointer; transition:all .2s; flex-shrink:0; }
+.emoji-disp:hover{ border-color:var(--lavender); background:#EDE9FE; }
+.emoji-grid{ display:none; position:absolute; top:60px; left:0; z-index:200; background:white; border-radius:18px; padding:11px; box-shadow:0 8px 32px rgba(0,0,0,.2); grid-template-columns:repeat(8,1fr); gap:3px; width:258px; }
+.emoji-grid.open{ display:grid; }
+.emoji-grid span{ font-size:1.35rem; cursor:pointer; border-radius:9px; padding:4px; text-align:center; transition:background .15s; }
+.emoji-grid span:hover{ background:#EDE9FE; }
+.img-upload-area { flex:1; min-width:200px; border:3px dashed #D4C8F8; border-radius:16px; background:#FAF8FF; padding:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; transition:all .2s; position:relative; min-height:90px; }
+.img-upload-area:hover{ border-color:var(--lavender); background:#EDE9FE; }
+.img-upload-area input[type="file"]{ display:none; }
+.img-upload-area .up-icon{ font-size:1.8rem; }
+.img-upload-area .up-label{ font-size:.8rem; font-weight:800; color:#aaa; text-align:center; }
+.img-preview-wrap{ position:relative; display:inline-block; }
+.img-preview{ width:72px; height:72px; object-fit:cover; border-radius:12px; border:3px solid var(--lavender); display:block; }
+.img-del-btn{ position:absolute; top:-8px; right:-8px; width:22px; height:22px; background:var(--coral); color:white; border:none; border-radius:50%; font-size:.75rem; cursor:pointer; display:grid; place-items:center; }
+.field{ background:#F8F7FF; border:3px solid #E5E3F8; border-radius:13px; padding:11px 13px; font-family:'Nunito',sans-serif; font-size:1rem; font-weight:700; color:var(--dark); outline:none; transition:border-color .2s; width:100%; }
+.field:focus{ border-color:var(--lavender); }
+.field::placeholder{ color:#ccc; }
+.add-btn{ background:linear-gradient(135deg,var(--lavender),var(--pink)); color:white; border:none; border-radius:13px; padding:12px 20px; font-family:'Fredoka One',cursive; font-size:1rem; cursor:pointer; transition:all .2s; white-space:nowrap; align-self:flex-end; }
+.add-btn:hover{ transform:scale(1.05); box-shadow:0 4px 15px rgba(167,139,250,.5); }
+.custom-list{ display:flex; flex-direction:column; gap:8px; }
+.ci { display:flex; align-items:center; gap:11px; background:#F8F7FF; border-radius:15px; padding:10px 13px; }
+.ci-thumb{ width:46px; height:46px; border-radius:11px; object-fit:cover; border:2px solid #E5E3F8; flex-shrink:0; }
+.ci-emoji-big{ font-size:2rem; flex-shrink:0; cursor:pointer; }
+.ci-info{ flex:1; }
+.ci-en{ font-family:'Fredoka One',cursive; font-size:1rem; color:var(--dark); }
+.ci-ko{ font-size:.76rem; color:#bbb; font-weight:700; }
+.ci-del{ background:#FFE4E4; border:none; border-radius:10px; width:30px; height:30px; font-size:.9rem; cursor:pointer; transition:background .15s; display:grid; place-items:center; }
+.ci-del:hover{ background:var(--coral); color:white; }
+.empty-msg{ text-align:center; color:#ccc; font-weight:800; padding:28px 0; font-size:.88rem; }
+
+/* ── Overlays ── */
+.big-fb{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); font-size:6rem; z-index:1000; pointer-events:none; transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+.big-fb.show{ transform:translate(-50%,-50%) scale(1); }
+.big-fb.hide{ transform:translate(-50%,-50%) scale(0); transition:transform .2s; }
+.overlay{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; place-items:center; z-index:2000; }
+.overlay.show{ display:grid; }
+.reward-box{ background:white; border-radius:34px; padding:38px 30px; text-align:center; max-width:290px; animation:popIn .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes popIn{from{transform:scale(0) rotate(-15deg)}to{transform:scale(1) rotate(0)}}
+.reward-box .re-em{ font-size:4.5rem; }
+.reward-box h2{ font-family:'Fredoka One',cursive; font-size:1.6rem; color:var(--dark); margin:9px 0 5px; }
+.reward-box p{ font-size:.82rem; color:#aaa; font-weight:700; margin-bottom:16px; }
+.reward-close{ background:var(--coral); color:white; border:none; border-radius:15px; padding:10px 26px; font-family:'Fredoka One',cursive; font-size:1.05rem; cursor:pointer; }
+
+@media(max-width:480px){
+  .header{ flex-direction:column; gap:9px; text-align:center; }
+  .quiz-opts{ grid-template-columns:1fr 1fr; }
+  .form-row{ flex-direction:column; }
+  .img-upload-area{ width:100%; }
+  .submode-row{ flex-wrap:wrap; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-shapes"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>🌈 My English Words!</h1>
+      <p>영어 단어를 배워봐요!</p>
+    </div>
+    <div class="stars-pill">
+      <span>⭐</span>
+      <span class="sc" id="star-count">0</span>
+      <span class="sl">별 모음!</span>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav-box">
+    <div class="cat-row">
+      <button class="ctab active" data-c="animals" onclick="setCat('animals',this)">🐾 동물</button>
+      <button class="ctab" data-c="fruits"  onclick="setCat('fruits',this)">🍎 과일</button>
+      <button class="ctab" data-c="colors"  onclick="setCat('colors',this)">🎨 색깔</button>
+      <button class="ctab" data-c="objects" onclick="setCat('objects',this)">🏠 물건</button>
+      <button class="ctab" data-c="custom"  onclick="setCat('custom',this)">✨ 우리 단어</button>
+    </div>
+    <div class="mode-row">
+      <!-- ① 아이콘 변경: 공부=🃏, 테스트=✏️, 엄마설정=⚙️ -->
+      <button class="mbtn active" id="mb-learn" onclick="setMode('learn')">🃏 공부</button>
+      <button class="mbtn" id="mb-quiz"  onclick="setMode('quiz')">✏️ 테스트</button>
+      <button class="mbtn" id="mb-mom"   onclick="setMode('mom')">⚙️ 엄마 설정</button>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog-wrap" id="prog-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-meta">
+      <span id="prog-label">0 / 0 배웠어요</span>
+      <span id="prog-pct">0%</span>
+    </div>
+  </div>
+
+  <!-- ══ LEARN PANEL ══ -->
+  <div id="learn-panel">
+    <div class="flashcard-stage">
+
+      <!-- ③ 대소문자 sub-mode + ② 그림 보기 토글 (기본 OFF) -->
+      <div class="controls-row">
+        <div class="submode-row">
+          <button class="smbtn active" id="sm-upper" onclick="setLearnSubmode('upper',this)">ABC 대문자</button>
+          <button class="smbtn" id="sm-lower" onclick="setLearnSubmode('lower',this)">abc 소문자</button>
+          <button class="smbtn" id="sm-both"  onclick="setLearnSubmode('both',this)">Abc 합쳐서</button>
+        </div>
+        <label class="img-toggle-wrap">
+          <span>🖼️ 그림</span>
+          <div class="toggle-switch">
+            <input type="checkbox" id="img-toggle" onchange="toggleImgVisible()">
+            <div class="toggle-track"></div>
+          </div>
+        </label>
+      </div>
+
+      <div class="card-counter" id="card-counter">1 / 1</div>
+      <div class="dot-row" id="dot-row"></div>
+
+      <!-- Flashcard -->
+      <div class="flashcard-outer" id="fc-outer" onclick="flipCard()">
+        <div class="flashcard-inner" id="fc-inner">
+          <div class="fc-face fc-front">
+            <!-- ② img-hidden by default -->
+            <div class="fc-img-area img-hidden" id="fc-img-area">
+              <span class="fc-emoji" id="fc-emoji">🐱</span>
+            </div>
+            <div class="fc-word-block">
+              <span class="fc-word-big" id="fc-word-big">CAT</span>
+              <span class="fc-word-hint" id="fc-word-hint">abc: cat</span>
+            </div>
+            <span class="flip-hint">눌러서 뒤집기 🔄</span>
+          </div>
+          <div class="fc-face fc-back">
+            <span style="font-size:2.8rem" id="fc-back-emoji">🐱</span>
+            <span class="fc-korean" id="fc-korean">고양이</span>
+            <span class="fc-word-sm" id="fc-word-sm">Cat</span>
+            <span class="fc-check-msg" id="fc-check-msg"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-row">
+        <button class="arrow-btn" id="btn-prev" onclick="navigate(-1)">◀️</button>
+        <button class="speak-fab" onclick="speakCurrent()">🔊 듣기</button>
+        <button class="arrow-btn" id="btn-next" onclick="navigate(1)">▶️</button>
+      </div>
+      <button class="learned-toggle" id="learned-toggle" onclick="toggleLearned()">✅ 배웠어요!</button>
+    </div>
+  </div>
+
+  <!-- ══ QUIZ PANEL ══ -->
+  <div id="quiz-panel">
+    <div class="quiz-wrap">
+      <div class="quiz-card" id="quiz-card"></div>
+    </div>
+  </div>
+
+  <!-- ══ MOM PANEL ══ -->
+  <div id="mom-panel">
+    <div class="mom-card">
+      <h2>⚙️ 단어 추가하기</h2>
+      <p class="sub">아이에게 가르치고 싶은 단어를 직접 추가해 보세요!</p>
+      <div class="add-form">
+        <div class="form-row">
+          <div class="emoji-wrap">
+            <div class="emoji-disp" id="emoji-disp" onclick="toggleEmojiPicker()">🌟</div>
+            <div class="emoji-grid" id="emoji-grid"></div>
+          </div>
+          <div class="img-upload-area" id="upload-area" onclick="document.getElementById('img-input').click()">
+            <input type="file" id="img-input" accept="image/*" onchange="handleImgUpload(event)">
+            <span class="up-icon">🖼️</span>
+            <span class="up-label">사진 추가 (선택)<br>눌러서 업로드</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <input class="field" id="f-word" placeholder="영어 단어 (예: Butterfly)" maxlength="30" style="flex:1;min-width:120px">
+          <input class="field" id="f-korean" placeholder="한국어 (예: 나비)" maxlength="20" style="flex:1;min-width:100px">
+          <button class="add-btn" onclick="addCustomWord()">➕ 추가</button>
+        </div>
+      </div>
+    </div>
+    <div class="mom-card">
+      <h2>📋 추가된 단어 목록</h2>
+      <p class="sub">이모지/사진을 누르면 발음을 들을 수 있어요!</p>
+      <div class="custom-list" id="custom-list">
+        <div class="empty-msg">아직 추가된 단어가 없어요<br>위에서 단어를 추가해 보세요! 😊</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<div class="big-fb" id="big-fb">⭐</div>
+<div class="overlay" id="overlay">
+  <div class="reward-box">
+    <div class="re-em" id="re-em">🏆</div>
+    <h2 id="re-title">대단해요!</h2>
+    <p id="re-sub">별 5개를 모았어요!</p>
+    <button class="reward-close" onclick="document.getElementById('overlay').classList.remove('show')">와, 고마워요! 🎉</button>
+  </div>
+</div>
+
+<script>
+/* ═══════ DATA ═══════ */
+const BUILTIN = {
+  animals:[
+    {word:'Cat',korean:'고양이',emoji:'🐱'},{word:'Dog',korean:'강아지',emoji:'🐶'},
+    {word:'Rabbit',korean:'토끼',emoji:'🐰'},{word:'Bear',korean:'곰',emoji:'🐻'},
+    {word:'Lion',korean:'사자',emoji:'🦁'},{word:'Elephant',korean:'코끼리',emoji:'🐘'},
+    {word:'Monkey',korean:'원숭이',emoji:'🐵'},{word:'Fish',korean:'물고기',emoji:'🐟'},
+    {word:'Bird',korean:'새',emoji:'🐦'},{word:'Duck',korean:'오리',emoji:'🦆'},
+    {word:'Frog',korean:'개구리',emoji:'🐸'},{word:'Horse',korean:'말',emoji:'🐴'},
+  ],
+  fruits:[
+    {word:'Apple',korean:'사과',emoji:'🍎'},{word:'Banana',korean:'바나나',emoji:'🍌'},
+    {word:'Orange',korean:'오렌지',emoji:'🍊'},{word:'Grape',korean:'포도',emoji:'🍇'},
+    {word:'Strawberry',korean:'딸기',emoji:'🍓'},{word:'Watermelon',korean:'수박',emoji:'🍉'},
+    {word:'Mango',korean:'망고',emoji:'🥭'},{word:'Peach',korean:'복숭아',emoji:'🍑'},
+    {word:'Pear',korean:'배',emoji:'🍐'},{word:'Cherry',korean:'체리',emoji:'🍒'},
+    {word:'Lemon',korean:'레몬',emoji:'🍋'},{word:'Pineapple',korean:'파인애플',emoji:'🍍'},
+  ],
+  colors:[
+    {word:'Red',korean:'빨간색',emoji:'🔴'},{word:'Blue',korean:'파란색',emoji:'🔵'},
+    {word:'Yellow',korean:'노란색',emoji:'🟡'},{word:'Green',korean:'초록색',emoji:'🟢'},
+    {word:'Orange',korean:'주황색',emoji:'🟠'},{word:'Purple',korean:'보라색',emoji:'🟣'},
+    {word:'Pink',korean:'분홍색',emoji:'🩷'},{word:'White',korean:'흰색',emoji:'⚪'},
+    {word:'Black',korean:'검은색',emoji:'⚫'},{word:'Brown',korean:'갈색',emoji:'🟤'},
+  ],
+  objects:[
+    {word:'Ball',korean:'공',emoji:'⚽'},{word:'Book',korean:'책',emoji:'📚'},
+    {word:'Car',korean:'자동차',emoji:'🚗'},{word:'House',korean:'집',emoji:'🏠'},
+    {word:'Star',korean:'별',emoji:'⭐'},{word:'Moon',korean:'달',emoji:'🌙'},
+    {word:'Sun',korean:'태양',emoji:'☀️'},{word:'Flower',korean:'꽃',emoji:'🌸'},
+    {word:'Tree',korean:'나무',emoji:'🌳'},{word:'Cake',korean:'케이크',emoji:'🎂'},
+    {word:'Balloon',korean:'풍선',emoji:'🎈'},{word:'Pencil',korean:'연필',emoji:'✏️'},
+  ],
+};
+const EMOJIS=['🐱','🐶','🐰','🐻','🦁','🐘','🐵','🐟','🐦','🦆','🐸','🐴',
+  '🍎','🍌','🍊','🍇','🍓','🍉','🥭','🍑','🍐','🍒','🍋','🍍',
+  '🌟','⭐','🌈','🌸','🌳','🌙','☀️','🎈','🎂','✏️','📚','🚗','🏠','⚽','🎨',
+  '🦋','🌺','🦄','🐙','🦊','🐼','🐨','🦒','🐬','🦅','🌻','🍄',
+  '🏖️','🏔️','🌊','❄️','🔥','💧','🌿','🍀','🌴','🎵','🎸','🎺'];
+
+let customWords=[];
+const learned={animals:new Set(),fruits:new Set(),colors:new Set(),objects:new Set(),custom:new Set()};
+let stars=0, curCat='animals', curMode='learn', curIdx=0, isFlipped=false;
+let learnSubmode='upper';  // 'upper' | 'lower' | 'both'
+let quizSubmode='picture'; // 'picture' | 'upper' | 'lower'
+let showImg=false;         // ② 그림 기본 OFF
+let quizList=[], qIdx=0, qScore=0, qAnswered=false;
+let selectedEmoji='🌟', pendingImgDataUrl=null, pickerOpen=false;
+
+/* ═══════ UTILS ═══════ */
+function speak(w){ if(!('speechSynthesis'in window))return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(w); u.lang='en-US';u.rate=0.85;u.pitch=1.2; speechSynthesis.speak(u); }
+function getWords(){ return curCat==='custom'?customWords:(BUILTIN[curCat]||[]); }
+function showFeedback(em){ const el=document.getElementById('big-fb'); el.textContent=em; el.classList.remove('hide'); el.classList.add('show'); setTimeout(()=>{el.classList.remove('show');el.classList.add('hide');},750); }
+function addStar(n=1){ stars+=n; document.getElementById('star-count').textContent=stars; const ms={5:'🎖️',10:'🥈',20:'🥇',30:'🏆',50:'👑',100:'🌈'}; if(ms[stars])showReward(ms[stars],`별 ${stars}개 달성!`,'정말 대단해요! 🎉'); }
+function showReward(em,t,s){ document.getElementById('re-em').textContent=em; document.getElementById('re-title').textContent=t; document.getElementById('re-sub').textContent=s; document.getElementById('overlay').classList.add('show'); }
+function updateProgress(){ const words=getWords(),total=words.length,done=learned[curCat].size,pct=total?Math.round(done/total*100):0; document.getElementById('prog-fill').style.width=pct+'%'; document.getElementById('prog-label').textContent=`${done} / ${total} 배웠어요`; document.getElementById('prog-pct').textContent=pct+'%'; }
+
+// ③ Word formatting helpers
+function fmtWord(w,sm){ if(sm==='upper')return w.toUpperCase(); if(sm==='lower')return w.toLowerCase(); return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase(); }
+function hintText(w,sm){ if(sm==='upper')return 'abc: '+w.toLowerCase(); if(sm==='lower')return 'ABC: '+w.toUpperCase(); return ''; }
+
+/* ═══════ CAT / MODE ═══════ */
+function setCat(cat,el){ curCat=cat;curIdx=0;isFlipped=false; document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); if(curMode==='learn')renderLearn(); else if(curMode==='quiz')startQuiz(); updateProgress(); }
+function setMode(mode){ curMode=mode;isFlipped=false; ['learn','quiz','mom'].forEach(m=>{ document.getElementById('mb-'+m).classList.toggle('active',m===mode); document.getElementById(m==='mom'?'mom-panel':m+'-panel').style.display=m===mode?'block':'none'; }); document.getElementById('prog-wrap').style.display=mode==='mom'?'none':'block'; if(mode==='learn')renderLearn(); else if(mode==='quiz')startQuiz(); else renderMom(); }
+
+/* ═══════ LEARN ═══════ */
+function setLearnSubmode(sm,el){ learnSubmode=sm; document.querySelectorAll('.smbtn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderLearn(); }
+function toggleImgVisible(){ showImg=document.getElementById('img-toggle').checked; renderLearn(); }
+
+function renderLearn(direction){
+  const words=getWords();
+  if(!words.length){
+    document.getElementById('fc-outer').style.opacity='.4';
+    document.getElementById('card-counter').textContent='단어 없음';
+    document.getElementById('dot-row').innerHTML='';
+    document.getElementById('fc-word-big').textContent='없음';
+    document.getElementById('fc-word-hint').textContent='';
+    document.getElementById('btn-prev').disabled=true;
+    document.getElementById('btn-next').disabled=true;
+    return;
+  }
+  document.getElementById('fc-outer').style.opacity='1';
+  const item=words[curIdx];
+  document.getElementById('card-counter').textContent=`${curIdx+1} / ${words.length}`;
+
+  // Dots
+  const dotRow=document.getElementById('dot-row'); dotRow.innerHTML='';
+  const showDots=Math.min(words.length,20);
+  for(let i=0;i<showDots;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i===curIdx?' current':(learned[curCat].has(i)?' done':''));
+    d.onclick=(()=>{const ii=i;return()=>navigateTo(ii,'right');})(i);
+    dotRow.appendChild(d);
+  }
+
+  // Flip reset
+  document.getElementById('fc-inner').classList.remove('flipped'); isFlipped=false;
+
+  // Slide anim
+  if(direction){ const outer=document.getElementById('fc-outer'); const ac=direction==='left'?'slide-left':'slide-right'; outer.classList.remove('slide-left','slide-right'); void outer.offsetWidth; outer.classList.add(ac); setTimeout(()=>outer.classList.remove(ac),400); }
+
+  // ② Image area toggle
+  const imgArea=document.getElementById('fc-img-area');
+  imgArea.classList.toggle('img-hidden',!showImg);
+  imgArea.innerHTML='';
+  if(item.imageUrl){ const img=document.createElement('img'); img.src=item.imageUrl; img.className='fc-user-img'; imgArea.appendChild(img); }
+  else { const em=document.createElement('span'); em.className='fc-emoji'; em.textContent=item.emoji; imgArea.appendChild(em); }
+
+  // ③ Word display
+  document.getElementById('fc-word-big').textContent=fmtWord(item.word,learnSubmode);
+  document.getElementById('fc-word-hint').textContent=hintText(item.word,learnSubmode);
+
+  // Back
+  document.getElementById('fc-back-emoji').textContent=item.emoji;
+  document.getElementById('fc-korean').textContent=item.korean;
+  document.getElementById('fc-word-sm').textContent=item.word;
+  const isL=learned[curCat].has(curIdx);
+  const ltBtn=document.getElementById('learned-toggle');
+  ltBtn.textContent=isL?'✅ 배웠어요! (취소)':'✅ 배웠어요!'; ltBtn.classList.toggle('done',isL);
+  document.getElementById('fc-check-msg').textContent=isL?'✓ 이미 배웠어요!':'';
+
+  document.getElementById('btn-prev').disabled=curIdx===0;
+  document.getElementById('btn-next').disabled=curIdx===words.length-1;
+  updateProgress();
+}
+
+function flipCard(){ const inner=document.getElementById('fc-inner'); isFlipped=!isFlipped; inner.classList.toggle('flipped',isFlipped); if(isFlipped)speak(getWords()[curIdx].word); }
+function speakCurrent(){ const w=getWords(); if(w.length)speak(w[curIdx].word); }
+function navigate(dir){ const w=getWords(); const ni=curIdx+dir; if(ni<0||ni>=w.length)return; curIdx=ni; renderLearn(dir>0?'right':'left'); }
+function navigateTo(idx,dir){ curIdx=idx; renderLearn(dir||'right'); }
+function toggleLearned(){ if(!getWords().length)return; if(learned[curCat].has(curIdx)){learned[curCat].delete(curIdx);showFeedback('📝');}else{learned[curCat].add(curIdx);addStar(1);showFeedback('⭐');} renderLearn(); }
+
+document.addEventListener('keydown',e=>{ if(curMode!=='learn')return; if(e.key==='ArrowRight')navigate(1); else if(e.key==='ArrowLeft')navigate(-1); else if(e.key===' '||e.key==='Enter')flipCard(); });
+let txS=null;
+document.getElementById('fc-outer').addEventListener('touchstart',e=>{txS=e.touches[0].clientX;},{passive:true});
+document.getElementById('fc-outer').addEventListener('touchend',e=>{ if(txS===null)return; const dx=e.changedTouches[0].clientX-txS; if(Math.abs(dx)>50){navigate(dx<0?1:-1);txS=null;} },{passive:true});
+
+/* ═══════ QUIZ ═══════ */
+function setQuizSubmode(sm){ quizSubmode=sm; startQuiz(); }
+
+function startQuiz(){
+  const words=getWords();
+  if(words.length<2){ document.getElementById('quiz-card').innerHTML=`<div style="padding:28px;text-align:center;color:#bbb;font-weight:800;">단어가 2개 이상 있어야 테스트를 할 수 있어요! 😊<br><button onclick="setMode('learn')" style="margin-top:14px;background:var(--lavender);color:white;border:none;border-radius:13px;padding:10px 22px;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;">공부하러 가기</button></div>`; return; }
+  quizList=[...words].sort(()=>Math.random()-.5); qIdx=0; qScore=0; qAnswered=false; renderQuiz();
+}
+
+function renderQuiz(){
+  const card=document.getElementById('quiz-card');
+  if(qIdx>=quizList.length){
+    const pct=Math.round(qScore/quizList.length*100);
+    const t=pct===100?'🏆':pct>=70?'🥇':pct>=40?'🥈':'⭐';
+    card.innerHTML=`<div class="quiz-result"><span class="big-em">${t}</span><h2>테스트 끝!</h2><p>${quizList.length}문제 중 <strong>${qScore}개</strong> 맞혔어요! (${pct}%)</p><button class="retry-btn" onclick="startQuiz()">다시 도전! 🔄</button></div>`;
+    return;
+  }
+  qAnswered=false;
+  const item=quizList[qIdx];
+  const all=getWords();
+
+  // ③ sub-mode pills for quiz
+  const pills=`<div class="quiz-submode-row">
+    <button class="qsmbtn${quizSubmode==='picture'?' active':''}" onclick="setQuizSubmode('picture')">🖼️ 그림</button>
+    <button class="qsmbtn${quizSubmode==='upper'?' active':''}"   onclick="setQuizSubmode('upper')">ABC 대문자</button>
+    <button class="qsmbtn${quizSubmode==='lower'?' active':''}"   onclick="setQuizSubmode('lower')">abc 소문자</button>
+  </div>`;
+
+  let visual='', hint='';
+  if(quizSubmode==='picture'){
+    visual=item.imageUrl
+      ?`<div class="quiz-visual"><img class="quiz-img-big" src="${item.imageUrl}"></div>`
+      :`<div class="quiz-visual"><span class="quiz-emoji-big">${item.emoji}</span></div>`;
+    hint='이 그림의 영어 이름은?';
+  } else {
+    const display=quizSubmode==='upper'?item.word.toUpperCase():item.word.toLowerCase();
+    visual=`<div class="quiz-visual"><span class="quiz-word-big">${display}</span></div>`;
+    hint='이 영어 단어의 한국어 뜻은?';
+  }
+
+  card.innerHTML=`
+    <div class="quiz-ctr">${qIdx+1} / ${quizList.length}</div>
+    ${pills}${visual}
+    <div class="quiz-hint">${hint}</div>
+    <div class="quiz-opts" id="qopts"></div>
+    <div class="quiz-fb" id="qfb"></div>
+    <button class="quiz-nxt" id="qnxt" onclick="nextQuiz()">다음 문제 ➡️</button>`;
+
+  const wrongs=all.filter(w=>w.word!==item.word).sort(()=>Math.random()-.5).slice(0,3);
+  const options=[...wrongs,item].sort(()=>Math.random()-.5);
+  const opts=document.getElementById('qopts');
+
+  options.forEach(opt=>{
+    const btn=document.createElement('button'); btn.className='qopt';
+    if(quizSubmode==='picture'){
+      // show English word as answer option
+      btn.textContent=opt.word;
+      btn.addEventListener('click',()=>handleAnswer(btn,opt.word===item.word,item.word,opts));
+    } else {
+      // show Korean as answer option
+      btn.textContent=opt.korean;
+      btn.addEventListener('click',()=>handleAnswer(btn,opt.word===item.word,item.korean,opts));
+    }
+    opts.appendChild(btn);
+  });
+}
+
+function handleAnswer(btn,correct,correctLabel,optsEl){
+  if(qAnswered)return; qAnswered=true;
+  optsEl.querySelectorAll('.qopt').forEach(b=>b.disabled=true);
+  if(correct){ btn.classList.add('correct'); qScore++; addStar(2); showFeedback('🎉'); document.getElementById('qfb').textContent='🌟 정답! 잘했어요!'; }
+  else { btn.classList.add('wrong'); optsEl.querySelectorAll('.qopt').forEach(b=>{if(b.textContent===correctLabel)b.classList.add('correct');}); showFeedback('😅'); document.getElementById('qfb').textContent=`정답은 "${correctLabel}"예요!`; speak(quizList[qIdx].word); }
+  document.getElementById('qnxt').style.display='inline-block';
+}
+function nextQuiz(){ qIdx++; renderQuiz(); }
+
+/* ═══════ MOM PANEL ═══════ */
+function buildEmojiGrid(){ const g=document.getElementById('emoji-grid'); EMOJIS.forEach(em=>{ const s=document.createElement('span'); s.textContent=em; s.addEventListener('click',()=>{ selectedEmoji=em; document.getElementById('emoji-disp').textContent=em; closeEmojiPicker(); }); g.appendChild(s); }); }
+function toggleEmojiPicker(){ pickerOpen=!pickerOpen; document.getElementById('emoji-grid').classList.toggle('open',pickerOpen); }
+function closeEmojiPicker(){ pickerOpen=false; document.getElementById('emoji-grid').classList.remove('open'); }
+document.addEventListener('click',e=>{ if(!e.target.closest('.emoji-wrap'))closeEmojiPicker(); });
+
+function handleImgUpload(e){ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=ev=>{pendingImgDataUrl=ev.target.result;renderUploadArea();}; r.readAsDataURL(f); e.target.value=''; }
+function renderUploadArea(){ const a=document.getElementById('upload-area'); if(pendingImgDataUrl){ a.innerHTML=`<input type="file" id="img-input" accept="image/*" onchange="handleImgUpload(event)"><div class="img-preview-wrap"><img class="img-preview" src="${pendingImgDataUrl}"><button class="img-del-btn" onclick="clearPendingImg(event)">✕</button></div>`; } else { a.innerHTML=`<input type="file" id="img-input" accept="image/*" onchange="handleImgUpload(event)"><span class="up-icon">🖼️</span><span class="up-label">사진 추가 (선택)<br>눌러서 업로드</span>`; a.onclick=()=>document.getElementById('img-input').click(); } }
+function clearPendingImg(e){ e.stopPropagation(); pendingImgDataUrl=null; renderUploadArea(); }
+
+function addCustomWord(){ const wE=document.getElementById('f-word'),kE=document.getElementById('f-korean'),w=wE.value.trim(),k=kE.value.trim(); if(!w||!k){alert('영어 단어와 한국어를 모두 입력해 주세요! 😊');return;} const fmt=w.charAt(0).toUpperCase()+w.slice(1).toLowerCase(); customWords.push({word:fmt,korean:k,emoji:selectedEmoji,imageUrl:pendingImgDataUrl||null}); wE.value='';kE.value=''; selectedEmoji='🌟';document.getElementById('emoji-disp').textContent='🌟'; pendingImgDataUrl=null;renderUploadArea();renderMom();showFeedback('✅'); }
+function deleteCustomWord(i){ const nL=new Set(); learned.custom.forEach(idx=>{if(idx<i)nL.add(idx);else if(idx>i)nL.add(idx-1);}); learned.custom.clear();nL.forEach(v=>learned.custom.add(v)); customWords.splice(i,1); if(curIdx>=customWords.length)curIdx=Math.max(0,customWords.length-1); renderMom(); }
+function renderMom(){ const list=document.getElementById('custom-list'); if(!customWords.length){list.innerHTML='<div class="empty-msg">아직 추가된 단어가 없어요<br>위에서 단어를 추가해 보세요! 😊</div>';return;} list.innerHTML=''; customWords.forEach((item,i)=>{ const div=document.createElement('div');div.className='ci'; const thumb=item.imageUrl?`<img class="ci-thumb" src="${item.imageUrl}" alt="${item.word}">`:`<span class="ci-emoji-big">${item.emoji}</span>`; div.innerHTML=`${thumb}<div class="ci-info"><div class="ci-en">${item.word}</div><div class="ci-ko">${item.korean}</div></div><button class="ci-del" onclick="deleteCustomWord(${i})">🗑️</button>`; div.querySelector(item.imageUrl?'.ci-thumb':'.ci-emoji-big').addEventListener('click',()=>speak(item.word)); list.appendChild(div); }); }
+
+/* ═══════ INIT ═══════ */
+buildEmojiGrid();
+renderLearn();
+</script>
+</body>
+</html>
